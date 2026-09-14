@@ -23,7 +23,7 @@ npm install
 npm run dev
 ```
 
-Browser: `http://localhost:5173/?controls=1`
+Browser: `http://localhost:5173/` — die Admin-Steuerung ist standardmäßig sichtbar.
 
 Platzhalter-Routen: `/materials`, `/costing`, `/teams`.
 
@@ -34,7 +34,7 @@ Platzhalter-Routen: `/materials`, `/costing`, `/teams`.
 | Leertaste | Start / Pause |
 | `R` zweimal | Reset |
 | `F` | Fullscreen |
-| `C` | Facilitator-Steuerung ein/aus |
+| `C` | Facilitator-Steuerung ausblenden/einblenden |
 | Esc | Steuerung schließen / Reset abbrechen |
 
 Zeiten in [`src/config/workshop.ts`](src/config/workshop.ts).

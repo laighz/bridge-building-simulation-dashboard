@@ -12,11 +12,6 @@ import { Timeline } from './Timeline.tsx'
 import { useWorkshopSession } from './useWorkshopSession.ts'
 import './DisplayView.css'
 
-function controlsFromQuery(): boolean {
-  if (typeof window === 'undefined') return false
-  return new URLSearchParams(window.location.search).has('controls')
-}
-
 function wallClock(nowMs: number): string {
   return new Intl.DateTimeFormat('de-DE', {
     hour: '2-digit',
@@ -27,7 +22,7 @@ function wallClock(nowMs: number): string {
 
 export function DisplayView() {
   const { state, view, nowMs, store } = useWorkshopSession()
-  const [controlsVisible, setControlsVisible] = useState(controlsFromQuery)
+  const [controlsVisible, setControlsVisible] = useState(true)
   const [resetArmed, setResetArmed] = useState(false)
 
   useEffect(() => {
