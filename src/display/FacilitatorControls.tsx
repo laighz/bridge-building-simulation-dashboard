@@ -1,6 +1,13 @@
 import { playFuturisticCue, speakGerman } from '../audio/speech.ts'
 import { workshopConfig, type PhaseId } from '../config/workshop.ts'
+import {
+  scissorsElapsed,
+  scissorsRemainingMs,
+  teamHasRunningScissors,
+  type ScissorsRental,
+} from '../domain/scissors.ts'
 import { teamLabel, type Team } from '../domain/teams.ts'
+import { formatDuration } from '../domain/time.ts'
 import { sessionStore } from '../store/browserStore.ts'
 import { workshopStore } from '../store/workshopStore.ts'
 import { toggleFullscreen } from './fullscreen.ts'
@@ -11,6 +18,7 @@ type Props = {
   activePhaseId: PhaseId
   teams: Team[]
   ttsApiKey: string
+  scissorsRentals: ScissorsRental[]
   nowMs: number
   onSelectPhase: (phase: PhaseId | null) => void
 }
@@ -36,6 +44,7 @@ export function FacilitatorControls({
   activePhaseId,
   teams,
   ttsApiKey,
+  scissorsRentals,
   nowMs,
   onSelectPhase,
 }: Props) {
@@ -89,15 +98,34 @@ export function FacilitatorControls({
         {teams.length === 0 ? (
           <span className="controls-status">Zuerst Teams anlegen</span>
         ) : (
-          teams.map((team, index) => (
-            <button
-              key={team.id}
-              type="button"
-              onClick={() => workshopStore.startScissors(team.id, nowMs)}
-            >
-              {teamLabel(team, index)}
-            </button>
-          ))
+          teams.map((team, index) => {
+            const running = teamHasRunningScissors(
+              scissorsRentals,
+              team.id,
+              nowMs,
+            )
+            const rental = scissorsRentals.find(
+              (item) => item.teamId === team.id && !scissorsElapsed(item, nowMs),
+            )
+            const due = scissorsRentals.some(
+              (item) => item.teamId === team.id && scissorsElapsed(item, nowMs),
+            )
+            return (
+              <button
+                key={team.id}
+                type="button"
+                className={running || due ? 'is-pressed' : undefined}
+                onClick={() => workshopStore.startScissors(team.id, nowMs)}
+              >
+                {teamLabel(team, index)}
+                {rental
+                  ? ` · ${formatDuration(scissorsRemainingMs(rental, nowMs))}`
+                  : due
+                    ? ' · zurück'
+                    : ''}
+              </button>
+            )
+          })
         )}
       </div>
       <div className="controls-row">

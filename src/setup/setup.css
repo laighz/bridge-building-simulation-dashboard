@@ -231,10 +231,14 @@
 .deck .eyebrow,
 .deck h1,
 .deck-body,
-.deck ul,
+.deck ul {
+  position: relative;
+  z-index: 3;
+  pointer-events: none;
+}
+
 .deck-progress,
 .deck-hint {
-  position: relative;
   z-index: 3;
   pointer-events: none;
 }

@@ -127,17 +127,17 @@ export function DisplayView() {
           {hero.value}
         </p>
         <p className="hero-sub">{nextCopy}</p>
+        <ScissorsRail
+          rentals={data.scissorsRentals}
+          teams={data.teams}
+          nowMs={nowMs}
+        />
         {resetArmed ? (
           <p className="reset-banner" role="status">
             Nochmal R drücken, um zurückzusetzen
           </p>
         ) : null}
         <MilestoneCards milestones={view.milestones} />
-        <ScissorsRail
-          rentals={data.scissorsRentals}
-          teams={data.teams}
-          nowMs={nowMs}
-        />
         <Timeline elapsedMs={view.elapsedMs} progress={view.progress} />
       </main>
 
@@ -147,6 +147,7 @@ export function DisplayView() {
         activePhaseId={view.activePhaseId}
         teams={data.teams}
         ttsApiKey={data.ttsApiKey}
+        scissorsRentals={data.scissorsRentals}
         nowMs={nowMs}
         onSelectPhase={(phase) => store.setPhaseOverride(phase)}
       />
