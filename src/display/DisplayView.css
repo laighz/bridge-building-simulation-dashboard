@@ -649,6 +649,10 @@
     padding-inline: 14px;
   }
 
+  .phase-label {
+    font-size: 0.68rem;
+  }
+
   .timeline-caption {
     white-space: normal;
     max-width: 7rem;

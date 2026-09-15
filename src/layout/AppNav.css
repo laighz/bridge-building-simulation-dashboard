@@ -94,8 +94,6 @@
 
 @media (max-width: 720px) {
   .app-nav-title {
-    max-width: 9.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none;
   }
 }

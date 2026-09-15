@@ -126,8 +126,9 @@
 }
 
 .bento-add.is-hero {
-  grid-column: span 2;
-  grid-row: span 2;
+  grid-column: 1 / -1;
+  grid-row: span 1;
+  min-height: 200px;
 }
 
 .bento-plus {
@@ -138,7 +139,7 @@
 
 .bento-foot {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: var(--space-4);
   margin-top: 22px;
@@ -147,6 +148,7 @@
 }
 
 .bento-foot .primary {
+  margin-inline-start: auto;
   background: var(--accent);
   color: var(--accent-ink);
   border: 0;
@@ -285,7 +287,7 @@
   }
 
   .bento-add.is-hero {
-    grid-column: span 2;
+    grid-column: 1 / -1;
     grid-row: span 1;
   }
 }
