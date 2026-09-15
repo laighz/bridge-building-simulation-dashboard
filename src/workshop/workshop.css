@@ -5,6 +5,10 @@
   padding-bottom: calc(64px + env(safe-area-inset-bottom));
 }
 
+.workshop-page:has(.sheet-actions) {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
 .sheet,
 .brief-grid,
 .cost-delta,
@@ -281,21 +285,41 @@
   padding: 4px;
 }
 
-.sheet-actions,
+.sheet-actions {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 15;
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 0;
+  padding: 12px max(16px, calc((100vw - 1120px) / 2))
+    calc(12px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  border-top: 1px solid var(--line);
+}
+
+@supports (backdrop-filter: blur(16px)) {
+  .sheet-actions {
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(16px);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .sheet-actions {
+    background: var(--bg);
+    backdrop-filter: none;
+  }
+}
+
 .jury-actions {
   display: flex;
   gap: var(--space-3);
   margin-top: var(--space-4);
   flex-wrap: wrap;
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-  padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--bg) 0%, transparent),
-    var(--bg) 28%
-  );
 }
 
 .sheet-actions button,
@@ -385,6 +409,19 @@
 @media (max-width: 720px) {
   .workshop-page {
     padding: 20px 16px 48px;
+  }
+
+  .workshop-page:has(.sheet-actions) {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .sheet-actions {
+    padding-inline: 16px;
+    justify-content: stretch;
+  }
+
+  .sheet-actions .primary {
+    flex: 1;
   }
 
   .sheet-head,
