@@ -132,6 +132,15 @@
   margin-top: 20px;
 }
 
+.jury-scores .brief-card {
+  min-width: min(100%, 260px);
+}
+
+.jury-scores .score-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
 .sheet-actions,
 .jury-actions {
   display: flex;

@@ -103,7 +103,8 @@ export function JuryPage() {
       <div className="brief-grid jury-scores">
         {CRITERIA.map((criterion) => (
           <label key={criterion.key} className="brief-card">
-            {criterion.label} (0–10)
+            {criterion.label}
+            <span className="score-hint">Punkte 0–10</span>
             <input
               type="number"
               min={0}

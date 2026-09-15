@@ -16,6 +16,11 @@ describe('lineTotal', () => {
   it('treats empty quantity as zero', () => {
     expect(lineTotal(0, 570_000)).toBe(0)
   })
+
+  it('does not render negative zero on unused saved-time lines', () => {
+    expect(lineTotal(0, -1_000_000)).toBe(0)
+    expect(Object.is(lineTotal(0, -1_000_000), -0)).toBe(false)
+  })
 })
 
 describe('sheetTotal', () => {

@@ -5,7 +5,9 @@ import {
 } from '../config/catalog.ts'
 
 export function lineTotal(quantity: number, unitPrice: number): number {
-  return Math.max(0, quantity) * unitPrice
+  const qty = Math.max(0, quantity)
+  if (qty === 0) return 0
+  return qty * unitPrice
 }
 
 export function sheetTotal(
