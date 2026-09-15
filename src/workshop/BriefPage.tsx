@@ -5,8 +5,11 @@ export function BriefPage() {
     <main className="workshop-page">
       <header className="brief-head">
         <div>
-          <p className="eyebrow">Projekt Brückenbau</p>
           <h1>Auftrag</h1>
+          <p className="brief-lead">
+            Zwei Tische, ein Meter Abstand, eine Brücke — geplant, kalkuliert
+            und gebaut unter Zeit- und Kostendruck.
+          </p>
         </div>
       </header>
 

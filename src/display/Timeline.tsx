@@ -10,6 +10,7 @@ export function Timeline({ elapsedMs, progress }: Props) {
   const total = totalMinutes(workshopConfig)
   const planningPct = (workshopConfig.planningMinutes / total) * 100
   const realizationPct = 100 - planningPct
+  const percent = Math.min(100, Math.round(progress * 100))
 
   return (
     <section className="timeline" aria-label="Zeitstrahl">
@@ -21,7 +22,14 @@ export function Timeline({ elapsedMs, progress }: Props) {
           Realisierung {workshopConfig.realizationMinutes} Min
         </div>
       </div>
-      <div className="timeline-track">
+      <div
+        className="timeline-track"
+        role="progressbar"
+        aria-label="Fortschritt"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+      >
         <div
           className="timeline-fill"
           style={{ width: `${Math.min(100, progress * 100)}%` }}

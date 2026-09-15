@@ -1,20 +1,47 @@
 :root {
   color-scheme: dark;
-  --bg: #0b1017;
-  --bg-2: #121a24;
-  --ink: #f3efe6;
-  --muted: #9aa7b8;
-  --line: rgba(243, 239, 230, 0.1);
+  --bg: #0c1118;
+  --bg-elevated: #151c26;
+  --bg-surface: #1a2330;
+  --bg-hover: #243040;
+  --ink: #f4f0e8;
+  --ink-secondary: #c5cdd8;
+  --muted: #a8b3c2;
+  --line: rgba(244, 240, 232, 0.12);
+  --line-strong: rgba(244, 240, 232, 0.22);
   --accent: #3ec6c9;
-  --accent-2: #7ad7d9;
+  --accent-2: #8adde0;
+  --accent-ink: #062325;
   --plan: #3ec6c9;
   --build: #e0a34a;
   --ok: #7dce86;
+  --ok-ink: #0d2414;
   --warn: #e8b84a;
+  --warn-ink: #2a1e05;
   --hot: #ef6a4c;
-  --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-  --nav-h: 42px;
+  --hot-ink: #2a0c06;
+  --focus: var(--accent);
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --nav-h: 56px;
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-panel: 20px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --text-caption: 0.8125rem;
+  --text-body: 1rem;
+  --text-ui: 0.9375rem;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --hit: 44px;
   font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -30,17 +57,125 @@ body,
   color: var(--ink);
 }
 
+html {
+  hanging-punctuation: first last;
+  scrollbar-color: var(--line-strong) var(--bg);
+}
+
 body {
   min-height: 100dvh;
   overflow: auto;
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 45%, #0c1118);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+a {
+  color: var(--accent-2);
+  text-underline-position: from-font;
+  text-decoration-thickness: from-font;
 }
 
 button {
   font: inherit;
   color: inherit;
+  min-height: var(--hit);
+  transition-property: scale, background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
 }
 
-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+button:not(:disabled):not(.deck-hit):active {
+  scale: 0.96;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  font-size: 16px;
+  color: inherit;
+  caret-color: var(--accent);
+}
+
+input[type='number'] {
+  font-variant-numeric: tabular-nums;
+}
+
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: var(--space-3);
+  top: var(--space-3);
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+#inhalt {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#inhalt:focus {
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

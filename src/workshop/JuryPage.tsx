@@ -28,17 +28,16 @@ export function JuryPage() {
     loadTestPassed: data.loadTestPassed,
     costExcluded,
   })
-  const pending =
-    data.loadTestPassed == null && !costExcluded && !disqualified
+  const pending = data.loadTestPassed == null && !costExcluded
 
   return (
     <main className="workshop-page jury-page">
       <header className="brief-head">
         <div>
-          <p className="eyebrow">
+          <h1>Jury &amp; Vergleich</h1>
+          <p className="brief-lead">
             {data.groupName || 'Gruppe noch nicht benannt'}
           </p>
-          <h1>Jury &amp; Vergleich</h1>
         </div>
       </header>
 
@@ -49,8 +48,7 @@ export function JuryPage() {
         </p>
       ) : pending ? (
         <p className="pending-banner" role="status">
-          Noch nicht ausgeschlossen. Belastungstest und 40-%-Regel stehen noch
-          aus oder sind erfüllt.
+          Belastungstest steht noch aus.
         </p>
       ) : (
         <p className="ok-banner" role="status">
@@ -83,17 +81,19 @@ export function JuryPage() {
         </article>
       </section>
 
-      <div className="jury-actions">
+      <div className="jury-actions" role="group" aria-label="Belastungstest">
         <button
           type="button"
-          className={data.loadTestPassed === true ? 'primary' : undefined}
+          className={data.loadTestPassed === true ? 'primary is-pressed' : undefined}
+          aria-pressed={data.loadTestPassed === true}
           onClick={() => workshopStore.setLoadTestPassed(true)}
         >
           Belastungstest 1 kg bestanden
         </button>
         <button
           type="button"
-          className={data.loadTestPassed === false ? 'danger' : undefined}
+          className={data.loadTestPassed === false ? 'danger is-pressed' : undefined}
+          aria-pressed={data.loadTestPassed === false}
           onClick={() => workshopStore.setLoadTestPassed(false)}
         >
           Belastungstest nicht bestanden
@@ -102,24 +102,56 @@ export function JuryPage() {
 
       <div className="brief-grid jury-scores">
         {CRITERIA.map((criterion) => (
-          <label key={criterion.key} className="brief-card">
-            {criterion.label}
+          <div key={criterion.key} className="brief-card">
+            <label htmlFor={`jury-${criterion.key}`}>{criterion.label}</label>
             <span className="score-hint">Punkte 0–10</span>
-            <input
-              type="number"
-              min={0}
-              max={10}
-              step={1}
-              inputMode="numeric"
-              value={data.jury[criterion.key]}
-              onChange={(event) =>
-                workshopStore.setJury({
-                  ...data.jury,
-                  [criterion.key]: Number(event.target.value),
-                })
-              }
-            />
-          </label>
+            <div className="score-control">
+              <button
+                type="button"
+                className="qty-btn"
+                disabled={data.jury[criterion.key] <= 0}
+                aria-label={`${criterion.label} verringern`}
+                onClick={() =>
+                  workshopStore.setJury({
+                    ...data.jury,
+                    [criterion.key]: data.jury[criterion.key] - 1,
+                  })
+                }
+              >
+                −
+              </button>
+              <input
+                id={`jury-${criterion.key}`}
+                type="number"
+                min={0}
+                max={10}
+                step={1}
+                inputMode="numeric"
+                className="score-value"
+                value={data.jury[criterion.key]}
+                onChange={(event) =>
+                  workshopStore.setJury({
+                    ...data.jury,
+                    [criterion.key]: Number(event.target.value),
+                  })
+                }
+              />
+              <button
+                type="button"
+                className="qty-btn"
+                disabled={data.jury[criterion.key] >= 10}
+                aria-label={`${criterion.label} erhöhen`}
+                onClick={() =>
+                  workshopStore.setJury({
+                    ...data.jury,
+                    [criterion.key]: data.jury[criterion.key] + 1,
+                  })
+                }
+              >
+                +
+              </button>
+            </div>
+          </div>
         ))}
       </div>
     </main>

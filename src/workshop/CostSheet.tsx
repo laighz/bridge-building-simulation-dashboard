@@ -36,12 +36,12 @@ export function CostSheet({
     (sum, item) => sum + lineTotal(qty[item.id] ?? 0, item.unitPrice),
     0,
   )
+  const submitted = submittedElapsedMs != null
 
   return (
     <section className="sheet">
       <header className="sheet-head">
         <div>
-          <p className="eyebrow">Projekt Brückenbau</p>
           <h1>{title}</h1>
         </div>
         <div className="sheet-meta">
@@ -63,13 +63,15 @@ export function CostSheet({
             ) : (
               <input
                 value={groupName}
+                placeholder="Teamname"
+                autoComplete="organization"
                 onChange={(event) =>
                   workshopStore.setGroupName(event.target.value)
                 }
               />
             )}
           </label>
-          <p>
+          <p className={submitted ? 'sheet-stamp is-done' : 'sheet-stamp'}>
             {timeLabel}:{' '}
             {submittedElapsedMs == null
               ? 'noch nicht abgegeben'
@@ -91,28 +93,53 @@ export function CostSheet({
           <tbody>
             {items.map((item) => {
               const quantity = qty[item.id] ?? 0
+              const max = item.maxQty ?? Number.POSITIVE_INFINITY
               return (
                 <tr key={item.id}>
                   <td>{item.label}</td>
                   <td>{formatEuro(item.unitPrice)}</td>
                   <td>
-                    <input
-                      className="sheet-qty"
-                      type="number"
-                      min={0}
-                      max={item.maxQty}
-                      step={1}
-                      inputMode="numeric"
-                      aria-label={`Anzahl ${item.label}`}
-                      value={quantity === 0 ? '' : quantity}
-                      onChange={(event) =>
-                        workshopStore.setQuantity(
-                          sheet,
-                          item.id,
-                          Number(event.target.value),
-                        )
-                      }
-                    />
+                    <div className="qty-control">
+                      <button
+                        type="button"
+                        className="qty-btn"
+                        disabled={quantity <= 0}
+                        aria-label={`Weniger ${item.label}`}
+                        onClick={() =>
+                          workshopStore.setQuantity(sheet, item.id, quantity - 1)
+                        }
+                      >
+                        −
+                      </button>
+                      <input
+                        className="sheet-qty"
+                        type="number"
+                        min={0}
+                        max={item.maxQty}
+                        step={1}
+                        inputMode="numeric"
+                        aria-label={`Anzahl ${item.label}`}
+                        value={quantity === 0 ? '' : quantity}
+                        onChange={(event) =>
+                          workshopStore.setQuantity(
+                            sheet,
+                            item.id,
+                            Number(event.target.value),
+                          )
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="qty-btn"
+                        disabled={quantity >= max}
+                        aria-label={`Mehr ${item.label}`}
+                        onClick={() =>
+                          workshopStore.setQuantity(sheet, item.id, quantity + 1)
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
                   </td>
                   <td>{formatEuro(lineTotal(quantity, item.unitPrice))}</td>
                 </tr>

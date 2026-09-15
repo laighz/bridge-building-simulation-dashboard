@@ -21,7 +21,9 @@ export function AppNav() {
 
   return (
     <nav className="app-nav" aria-label="Workshop">
-      <span className="app-nav-title">{workshopConfig.title}</span>
+      <NavLink to="/" end className="app-nav-title">
+        {workshopConfig.title}
+      </NavLink>
       <div className="app-nav-links">
         {LINKS.map((link) => (
           <NavLink
@@ -36,7 +38,12 @@ export function AppNav() {
           </NavLink>
         ))}
       </div>
-      <span className="app-nav-clock">{remaining}</span>
+      <p className="app-nav-clock" aria-live="polite">
+        <span className="app-nav-clock-label">
+          {view.isOvertime ? 'Überzogen' : 'Rest'}
+        </span>
+        <span className="app-nav-clock-value">{remaining}</span>
+      </p>
     </nav>
   )
 }

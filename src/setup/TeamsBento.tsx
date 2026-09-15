@@ -21,7 +21,6 @@ export function TeamsBento({
   return (
     <main className="bento">
       <header className="bento-head">
-        <p className="eyebrow">Vor dem Start</p>
         <h1>Wer spielt?</h1>
         <p className="bento-lead">
           Jede Kachel ist ein Unternehmen. Plus für ein weiteres Team, dann
@@ -35,13 +34,16 @@ export function TeamsBento({
             key={team.id}
             className={`bento-card${index === 0 ? ' is-hero' : ''}`}
           >
-            <span className="bento-index">{String(index + 1).padStart(2, '0')}</span>
+            <span className="bento-index" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')}
+            </span>
             <label>
-              Teamname
+              Team {index + 1}
               <input
                 autoFocus={index === teams.length - 1 && team.name === ''}
                 value={team.name}
                 placeholder={`Team ${index + 1}`}
+                autoComplete="off"
                 onChange={(event) => onRename(team.id, event.target.value)}
               />
             </label>
@@ -49,9 +51,8 @@ export function TeamsBento({
               type="button"
               className="bento-remove"
               onClick={() => onRemove(team.id)}
-              aria-label={`Team ${index + 1} entfernen`}
             >
-              Entfernen
+              Team entfernen
             </button>
           </article>
         ))}
@@ -69,7 +70,13 @@ export function TeamsBento({
       </div>
 
       <footer className="bento-foot">
-        <p>{teams.length === 0 ? 'Noch keine Teams' : `${teams.length} Teams`}</p>
+        <p>
+          {teams.length === 0
+            ? 'Noch keine Teams. Legen Sie mindestens eines an.'
+            : ready
+              ? `${teams.length} ${teams.length === 1 ? 'Team' : 'Teams'} — bereit.`
+              : `${teams.length} Teams. Jedes Team braucht einen Namen.`}
+        </p>
         <button
           type="button"
           className="primary"

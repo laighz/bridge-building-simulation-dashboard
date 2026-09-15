@@ -21,7 +21,7 @@ export function RulesDeck({
   const last = index === total - 1
 
   return (
-    <section className="deck" onClick={onClick} role="presentation">
+    <section className="deck" onClick={onClick} aria-label="Regeln">
       <button
         type="button"
         className="deck-hit deck-hit-left"
@@ -42,9 +42,10 @@ export function RulesDeck({
       />
 
       <p className="deck-progress">
+        {slide.kicker}
+        <span aria-hidden="true"> · </span>
         {index + 1} / {total}
       </p>
-      <p className="eyebrow">{slide.kicker}</p>
       <h1>{slide.title}</h1>
       {slide.body ? <p className="deck-body">{slide.body}</p> : null}
       {slide.bullets ? (
@@ -56,8 +57,8 @@ export function RulesDeck({
       ) : null}
 
       <p className="deck-hint">
-        <span>‹ zurück</span>
-        <span>{last ? 'rechts: Timer starten' : 'vor ›'}</span>
+        <span>Zurück</span>
+        <span>{last ? 'Timer starten' : 'Weiter'}</span>
       </p>
     </section>
   )

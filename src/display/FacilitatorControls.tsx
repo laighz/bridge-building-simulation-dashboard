@@ -57,43 +57,33 @@ export function FacilitatorControls({
         <span className="controls-status">{statusLabel}</span>
       </div>
       <div className="controls-row">
-        <button type="button" onClick={() => sessionStore.toggleRunning()}>
+        <button type="button" className="primary" onClick={() => sessionStore.toggleRunning()}>
           Start / Pause
         </button>
         <button type="button" onClick={resetWorkshop}>
-          Reset
+          Zurücksetzen
         </button>
         <button type="button" onClick={() => void toggleFullscreen()}>
-          Fullscreen
+          Vollbild
         </button>
         <button type="button" onClick={() => onSelectPhase(null)}>
-          Phase auto
+          Phase automatisch
         </button>
       </div>
-      <div className="controls-row wrap">
+      <div className="controls-row wrap" role="group" aria-label="Phase setzen">
         {workshopConfig.phases.map((phase) => (
           <button
             key={phase.id}
             type="button"
             className={phase.id === activePhaseId ? 'is-pressed' : undefined}
+            aria-pressed={phase.id === activePhaseId}
             onClick={() => onSelectPhase(phase.id)}
           >
             {phase.label}
           </button>
         ))}
       </div>
-      <div className="controls-row wrap">
-        {JUMPS.map((jump) => (
-          <button
-            key={jump.label}
-            type="button"
-            onClick={() => sessionStore.jumpToElapsedMs(jump.ms)}
-          >
-            {jump.label}
-          </button>
-        ))}
-      </div>
-      <div className="controls-row wrap">
+      <div className="controls-row wrap" role="group" aria-label="Schere 30 Minuten">
         <span className="controls-status">Schere 30 Min</span>
         {teams.length === 0 ? (
           <span className="controls-status">Zuerst Teams anlegen</span>
@@ -115,6 +105,7 @@ export function FacilitatorControls({
                 key={team.id}
                 type="button"
                 className={running || due ? 'is-pressed' : undefined}
+                aria-pressed={running || due}
                 onClick={() => workshopStore.startScissors(team.id, nowMs)}
               >
                 {teamLabel(team, index)}
@@ -128,36 +119,53 @@ export function FacilitatorControls({
           })
         )}
       </div>
-      <div className="controls-row">
-        <label className="controls-key">
-          ElevenLabs
-          <input
-            type="password"
-            autoComplete="off"
-            placeholder="API-Key optional"
-            value={ttsApiKey}
-            onChange={(event) => workshopStore.setTtsApiKey(event.target.value)}
-          />
-        </label>
-        <button
-          type="button"
-          onClick={() => {
-            void speakGerman(
-              'Achtung. Stimme bereit. Die Schere muss zurück.',
-              {
-                elevenLabsKey:
-                  ttsApiKey || import.meta.env.VITE_ELEVENLABS_API_KEY,
-                voiceId: import.meta.env.VITE_ELEVENLABS_VOICE_ID,
-                playCue: () => playFuturisticCue(),
-              },
-            )
-          }}
-        >
-          Stimme testen
-        </button>
-      </div>
+      <details className="controls-more">
+        <summary>Zeitsprünge</summary>
+        <div className="controls-row wrap">
+          {JUMPS.map((jump) => (
+            <button
+              key={jump.label}
+              type="button"
+              onClick={() => sessionStore.jumpToElapsedMs(jump.ms)}
+            >
+              {jump.label}
+            </button>
+          ))}
+        </div>
+      </details>
+      <details className="controls-more">
+        <summary>Ansage</summary>
+        <div className="controls-row">
+          <label className="controls-key">
+            ElevenLabs-Schlüssel
+            <input
+              type="password"
+              autoComplete="off"
+              placeholder="optional"
+              value={ttsApiKey}
+              onChange={(event) => workshopStore.setTtsApiKey(event.target.value)}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => {
+              void speakGerman(
+                'Achtung. Stimme bereit. Die Schere muss zurück.',
+                {
+                  elevenLabsKey:
+                    ttsApiKey || import.meta.env.VITE_ELEVENLABS_API_KEY,
+                  voiceId: import.meta.env.VITE_ELEVENLABS_VOICE_ID,
+                  playCue: () => playFuturisticCue(),
+                },
+              )
+            }}
+          >
+            Stimme testen
+          </button>
+        </div>
+      </details>
       <p className="controls-help">
-        Tasten: Leertaste Start/Pause · R Reset (zweimal) · F Fullscreen · C
+        Tasten: Leertaste Start/Pause · R zweimal zurücksetzen · F Vollbild · C
         Steuerung · Esc schließen
       </p>
     </aside>

@@ -1,41 +1,42 @@
 .setup {
-  min-height: calc(100dvh - var(--nav-h, 0px));
+  min-height: 100dvh;
   height: 100dvh;
   overflow: auto;
   background:
-    radial-gradient(900px 420px at 8% -10%, rgba(62, 198, 201, 0.16), transparent 55%),
-    radial-gradient(800px 480px at 100% 100%, rgba(224, 163, 74, 0.12), transparent 50%),
-    linear-gradient(180deg, #101826 0%, var(--bg) 48%);
+    radial-gradient(900px 420px at 8% -10%, rgba(62, 198, 201, 0.14), transparent 55%),
+    linear-gradient(180deg, #121922 0%, var(--bg) 48%);
 }
 
 .bento,
 .deck {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 36px 32px 48px;
+  padding: 40px 32px 56px;
 }
 
 .bento-head h1,
 .deck h1 {
-  margin: 6px 0 0;
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
   letter-spacing: -0.05em;
-  line-height: 0.95;
+  line-height: 0.98;
+  text-wrap: balance;
 }
 
 .bento-lead,
 .deck-body {
   max-width: 40rem;
-  color: var(--muted);
+  color: var(--ink-secondary);
   font-size: 1.15rem;
-  line-height: 1.45;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: 170px;
-  gap: 14px;
+  grid-auto-rows: minmax(170px, auto);
+  gap: var(--space-4);
   margin-top: 28px;
 }
 
@@ -44,7 +45,7 @@
   position: relative;
   border-radius: 22px;
   border: 1px solid var(--line);
-  background: rgba(15, 22, 32, 0.78);
+  background: var(--bg-elevated);
   overflow: hidden;
 }
 
@@ -52,7 +53,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 16px 18px 14px;
+  padding: 18px 18px 16px;
+  gap: 8px;
 }
 
 .bento-card.is-hero {
@@ -65,9 +67,10 @@
   top: 12px;
   right: 16px;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 3.4rem;
-  color: rgba(243, 239, 230, 0.08);
+  font-size: 3.2rem;
+  color: rgba(244, 240, 232, 0.1);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .bento-card label {
@@ -75,7 +78,9 @@
   flex-direction: column;
   gap: 6px;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  z-index: 1;
 }
 
 .bento-card input {
@@ -84,19 +89,27 @@
   border-bottom: 1px solid var(--line);
   color: var(--ink);
   font-size: 1.35rem;
-  padding: 4px 0;
+  padding: 8px 0;
   width: 100%;
+  min-height: var(--hit);
 }
 
 .bento-remove {
   align-self: flex-start;
-  margin-top: 10px;
+  margin-top: 4px;
   background: transparent;
   border: 0;
   color: var(--muted);
   cursor: pointer;
-  padding: 0;
-  font-size: 0.8rem;
+  padding: 8px 0;
+  min-height: var(--hit);
+  font-size: var(--text-ui);
+}
+
+@media (hover: hover) {
+  .bento-remove:hover {
+    color: #ffd0c6;
+  }
 }
 
 .bento-add {
@@ -108,7 +121,8 @@
   cursor: pointer;
   color: var(--accent-2);
   border-style: dashed;
-  background: rgba(62, 198, 201, 0.05);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  min-height: var(--hit);
 }
 
 .bento-add.is-hero {
@@ -117,27 +131,30 @@
 }
 
 .bento-plus {
-  font-size: 4.2rem;
+  font-size: 3.6rem;
   line-height: 0.8;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .bento-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-4);
   margin-top: 22px;
   color: var(--muted);
+  flex-wrap: wrap;
 }
 
-.bento-foot .primary,
-.sheet-actions button.primary {
+.bento-foot .primary {
   background: var(--accent);
-  color: #062325;
+  color: var(--accent-ink);
   border: 0;
   border-radius: 999px;
   padding: 12px 22px;
   cursor: pointer;
+  min-height: var(--hit);
+  font-weight: 600;
 }
 
 .bento-foot .primary:disabled {
@@ -151,8 +168,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: 80px;
-  user-select: none;
+  padding-bottom: 88px;
 }
 
 .deck h1 {
@@ -167,36 +183,39 @@
 }
 
 .deck li {
-  margin: 8px 0;
-  padding-left: 1.1em;
+  margin: 10px 0;
+  padding-inline-start: 1.1em;
+  line-height: 1.35;
+  text-wrap: pretty;
 }
 
 .deck li::before {
   content: '—';
   color: var(--accent-2);
-  margin-right: 0.6em;
-  margin-left: -1.1em;
+  margin-inline-end: 0.6em;
+  margin-inline-start: -1.1em;
 }
 
 .deck-progress {
   position: absolute;
   top: 28px;
-  right: 32px;
+  inset-inline-end: 32px;
   margin: 0;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.04em;
   color: var(--muted);
+  font-weight: 600;
 }
 
 .deck-hint {
   position: absolute;
-  left: 32px;
-  right: 32px;
+  inset-inline: 32px;
   bottom: 28px;
   display: flex;
   justify-content: space-between;
   color: var(--muted);
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-ui);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .deck-hit {
@@ -208,27 +227,34 @@
   background: transparent;
   cursor: pointer;
   z-index: 2;
+  min-height: 0;
+  scale: none;
+}
+
+.deck-hit:active {
+  scale: none;
 }
 
 .deck-hit-left {
-  left: 0;
+  inset-inline-start: 0;
   cursor: w-resize;
 }
 
 .deck-hit-right {
-  right: 0;
+  inset-inline-end: 0;
   cursor: e-resize;
 }
 
-.deck-hit-left:hover {
-  background: linear-gradient(90deg, rgba(243, 239, 230, 0.04), transparent);
+@media (hover: hover) {
+  .deck-hit-left:hover {
+    background: linear-gradient(90deg, rgba(244, 240, 232, 0.04), transparent);
+  }
+
+  .deck-hit-right:hover {
+    background: linear-gradient(270deg, rgba(62, 198, 201, 0.08), transparent);
+  }
 }
 
-.deck-hit-right:hover {
-  background: linear-gradient(270deg, rgba(62, 198, 201, 0.08), transparent);
-}
-
-.deck .eyebrow,
 .deck h1,
 .deck-body,
 .deck ul {
@@ -244,6 +270,11 @@
 }
 
 @media (max-width: 900px) {
+  .bento,
+  .deck {
+    padding-inline: 20px;
+  }
+
   .bento-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -251,5 +282,21 @@
   .bento-card.is-hero {
     grid-column: span 2;
     grid-row: span 1;
+  }
+
+  .bento-add.is-hero {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-card.is-hero,
+  .bento-add.is-hero {
+    grid-column: span 1;
   }
 }

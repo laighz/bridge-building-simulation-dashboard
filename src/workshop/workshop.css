@@ -1,73 +1,120 @@
 .workshop-page {
   min-height: calc(100dvh - var(--nav-h));
   overflow: auto;
-  padding: 24px 28px 48px;
+  padding: 28px 32px 64px;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
+
+.sheet,
+.brief-grid,
+.cost-delta,
+.jury-compare {
+  width: min(1120px, 100%);
+  margin-inline: auto;
 }
 
 .sheet-head,
 .brief-head {
   display: flex;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--space-5);
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .sheet-head h1,
 .brief-head h1,
 .jury-page h1 {
-  margin: 4px 0 0;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.brief-lead {
+  margin: 8px 0 0;
+  max-width: 46rem;
+  color: var(--ink-secondary);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .sheet-meta {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 220px;
+  gap: var(--space-3);
+  min-width: min(100%, 240px);
 }
 
 .sheet-meta label,
 .jury-page label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: var(--text-caption);
+  font-weight: 600;
 }
 
 .sheet-meta input,
 .sheet-meta select,
 .sheet-table input,
-.jury-page input {
-  background: #151c27;
+.jury-page input,
+.jury-page select {
+  background: var(--bg-elevated);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   color: var(--ink);
-  padding: 6px 8px;
+  padding: 10px 12px;
   width: 100%;
+  min-height: var(--hit);
+}
+
+.sheet-stamp {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  color: var(--ink-secondary);
+  font-size: var(--text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-stamp.is-done {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 35%, var(--line));
 }
 
 .sheet-table-wrap {
   overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--bg-elevated);
 }
 
 .sheet-table {
   width: 100%;
   border-collapse: collapse;
-  background: rgba(15, 22, 32, 0.78);
 }
 
 .sheet-table th,
 .sheet-table td {
-  border: 1px solid var(--line);
-  padding: 8px 10px;
-  text-align: left;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 14px;
+  text-align: start;
 }
 
-.sheet-table th {
-  color: var(--accent-2);
-  font-weight: 650;
+.sheet-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface);
+  color: var(--ink-secondary);
+  font-weight: 600;
+  font-size: var(--text-caption);
+  z-index: 1;
 }
 
 .sheet-table td:nth-child(2),
@@ -76,61 +123,130 @@
 .sheet-table th:nth-child(2),
 .sheet-table th:nth-child(3),
 .sheet-table th:nth-child(4) {
-  text-align: right;
+  text-align: end;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .sheet-table tfoot th {
   color: var(--ink);
+  font-size: 1.05rem;
+  border-bottom: 0;
+  background: color-mix(in srgb, var(--bg-surface) 80%, black);
+}
+
+.qty-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.qty-btn {
+  width: var(--hit);
+  min-width: var(--hit);
+  min-height: var(--hit);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+@media (hover: hover) {
+  .qty-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+  }
 }
 
 .sheet-table input[type='number'],
 .sheet-qty {
-  width: 5.5rem;
-  text-align: right;
+  width: 4.75rem;
+  text-align: end;
+  min-height: var(--hit);
+  padding: 8px;
 }
 
 .cost-delta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin-top: 20px;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
   align-items: start;
 }
 
-.cost-delta article {
-  background: rgba(15, 22, 32, 0.78);
+.cost-delta article,
+.jury-compare article {
+  background: var(--bg-elevated);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
 }
 
-.cost-delta strong {
+.cost-delta span,
+.jury-compare span {
+  color: var(--muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+
+.cost-delta strong,
+.jury-compare strong {
   display: block;
-  font-size: 1.25rem;
-  margin-top: 4px;
+  font-size: 1.35rem;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 .cost-delta .disqualified,
-.cost-delta .ok-banner {
+.cost-delta .ok-banner,
+.cost-delta .pending-banner {
   grid-column: 1 / -1;
   margin: 0;
 }
 
+.pending-banner,
+.disqualified,
+.ok-banner {
+  padding: 12px 16px;
+  border-radius: var(--radius-card);
+  font-weight: 600;
+}
+
 .pending-banner {
-  background: rgba(224, 163, 74, 0.16);
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
   color: #f3ddb0;
-  padding: 10px 14px;
-  border-radius: 10px;
+}
+
+.disqualified {
+  background: color-mix(in srgb, var(--hot) 16%, transparent);
+  color: #ffd0c6;
+}
+
+.ok-banner {
+  background: color-mix(in srgb, var(--ok) 16%, transparent);
+  color: #b7e8bc;
 }
 
 .jury-actions button.danger {
-  background: rgba(239, 106, 76, 0.22);
-  border-color: #ef6a4c;
+  background: color-mix(in srgb, var(--hot) 22%, transparent);
+  border-color: var(--hot);
+  color: #ffd0c6;
+}
+
+.jury-actions button.danger.is-pressed,
+.jury-actions button.primary.is-pressed {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .jury-scores {
-  margin-top: 20px;
+  margin-top: var(--space-5);
 }
 
 .jury-scores .brief-card {
@@ -139,56 +255,98 @@
 
 .jury-scores .score-hint {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: var(--text-caption);
+  font-weight: 400;
+}
+
+.score-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.jury-page input.score-value {
+  width: 4.5rem;
+  min-width: 4.5rem;
+  min-height: var(--hit);
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.8rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: 4px;
 }
 
 .sheet-actions,
 .jury-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
   flex-wrap: wrap;
 }
 
 .sheet-actions button,
 .jury-actions button,
 .brief-grid button {
-  background: #1c2735;
+  background: var(--bg-surface);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 8px 14px;
+  border-radius: var(--radius-control);
+  padding: 10px 16px;
   cursor: pointer;
+  min-height: var(--hit);
+  font-size: var(--text-ui);
 }
 
 .sheet-actions button.primary,
 .jury-actions button.primary {
   background: var(--accent);
-  color: #062325;
+  color: var(--accent-ink);
   border-color: transparent;
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .sheet-actions button:hover,
+  .jury-actions button:hover,
+  .qty-btn:hover:not(:disabled) {
+    border-color: var(--line-strong);
+  }
 }
 
 .brief-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
+  gap: var(--space-4);
 }
 
 .brief-card {
-  background: rgba(15, 22, 32, 0.78);
+  background: var(--bg-elevated);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px 18px;
+  border-radius: var(--radius-card);
+  padding: 18px 20px;
 }
 
 .brief-card h2 {
   margin: 0 0 8px;
-  font-size: 1.05rem;
-  color: var(--accent-2);
+  font-size: 1.08rem;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.brief-card p,
+.brief-card li {
+  color: var(--ink-secondary);
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .brief-card ul {
   margin: 0;
-  padding-left: 1.1rem;
+  padding-inline-start: 1.1rem;
 }
 
 .brief-card li {
@@ -198,33 +356,35 @@
 .jury-compare {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin: 16px 0;
+  gap: var(--space-3);
+  margin: 16px auto;
 }
 
-.jury-compare article {
-  background: rgba(15, 22, 32, 0.78);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px 14px;
+.jury-page .brief-head,
+.jury-page .jury-actions,
+.jury-page .pending-banner,
+.jury-page .disqualified,
+.jury-page .ok-banner {
+  width: min(1120px, 100%);
+  margin-inline: auto;
 }
 
-.jury-compare strong {
-  display: block;
-  font-size: 1.3rem;
-  margin-top: 4px;
+.jury-page .brief-head {
+  margin-bottom: var(--space-4);
 }
 
-.disqualified {
-  background: rgba(239, 106, 76, 0.16);
-  color: #ffd0c6;
-  padding: 10px 14px;
-  border-radius: 10px;
-}
+@media (max-width: 720px) {
+  .workshop-page {
+    padding: 20px 16px 48px;
+  }
 
-.ok-banner {
-  background: rgba(111, 191, 115, 0.16);
-  color: #b7e8bc;
-  padding: 10px 14px;
-  border-radius: 10px;
+  .sheet-head,
+  .brief-head {
+    flex-direction: column;
+  }
+
+  .qty-control {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }

@@ -14,19 +14,24 @@ function AppShell() {
   const setup = state.status === 'idle'
 
   return (
-    <>
+    <div className="app-shell">
+      <a className="skip-link" href="#inhalt">
+        Zum Inhalt
+      </a>
       <Announcer />
       {setup ? null : <AppNav />}
-      <Routes>
-        <Route path="/" element={setup ? <SetupView /> : <DisplayView />} />
-        <Route path="/brief" element={<BriefPage />} />
-        <Route path="/materials" element={<MaterialsPage />} />
-        <Route path="/estimate" element={<EstimatePage mode="estimate" />} />
-        <Route path="/actual" element={<EstimatePage mode="actual" />} />
-        <Route path="/jury" element={<JuryPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </>
+      <div id="inhalt" tabIndex={-1}>
+        <Routes>
+          <Route path="/" element={setup ? <SetupView /> : <DisplayView />} />
+          <Route path="/brief" element={<BriefPage />} />
+          <Route path="/materials" element={<MaterialsPage />} />
+          <Route path="/estimate" element={<EstimatePage mode="estimate" />} />
+          <Route path="/actual" element={<EstimatePage mode="actual" />} />
+          <Route path="/jury" element={<JuryPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </div>
   )
 }
 

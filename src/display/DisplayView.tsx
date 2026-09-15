@@ -92,10 +92,7 @@ export function DisplayView() {
       <header className="topbar">
         <div className="brand">
           <BridgeMark />
-          <div>
-            <p className="eyebrow">Projekt-Simulation</p>
-            <h1>{workshopConfig.title}</h1>
-          </div>
+          <h1>{workshopConfig.title}</h1>
         </div>
         <PhaseStepper
           phases={view.phases}
@@ -117,9 +114,9 @@ export function DisplayView() {
             Pausiert — Uhr steht. Leertaste zum Fortsetzen.
           </p>
         ) : null}
-        {state.status === 'running' ? (
-          <p className="run-banner" role="status">
-            Timer läuft
+        {resetArmed ? (
+          <p className="reset-banner" role="status">
+            Nochmal R drücken, um zurückzusetzen
           </p>
         ) : null}
         <p className="hero-label">{hero.label}</p>
@@ -132,18 +129,13 @@ export function DisplayView() {
           teams={data.teams}
           nowMs={nowMs}
         />
-        {resetArmed ? (
-          <p className="reset-banner" role="status">
-            Nochmal R drücken, um zurückzusetzen
-          </p>
-        ) : null}
         <MilestoneCards milestones={view.milestones} />
         <Timeline elapsedMs={view.elapsedMs} progress={view.progress} />
       </main>
 
       <FacilitatorControls
         visible={controlsVisible}
-        statusLabel={`${statusLabel} · Phase ${phaseLabel(view.activePhaseId)}`}
+        statusLabel={`${statusLabel} · ${phaseLabel(view.activePhaseId)}`}
         activePhaseId={view.activePhaseId}
         teams={data.teams}
         ttsApiKey={data.ttsApiKey}

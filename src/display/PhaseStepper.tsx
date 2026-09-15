@@ -6,6 +6,12 @@ type Props = {
   onSelect?: (phase: PhaseId) => void
 }
 
+const STATE_COPY: Record<PhaseView['status'], string> = {
+  upcoming: '',
+  active: 'jetzt',
+  completed: 'fertig',
+}
+
 export function PhaseStepper({ phases, onSelect }: Props) {
   return (
     <ol className="phases" aria-label="Projektphasen">
@@ -17,7 +23,9 @@ export function PhaseStepper({ phases, onSelect }: Props) {
             aria-current={phase.status === 'active' ? 'step' : undefined}
             onClick={() => onSelect?.(phase.id)}
           >
-            <span className="phase-index">{index + 1}</span>
+            <span className="phase-index">
+              {STATE_COPY[phase.status] || String(index + 1)}
+            </span>
             <span className="phase-label">{phase.label}</span>
           </button>
         </li>
