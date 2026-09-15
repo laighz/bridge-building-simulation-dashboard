@@ -1,6 +1,6 @@
 .display {
-  height: 100dvh;
-  max-height: 100dvh;
+  height: calc(100dvh - var(--nav-h));
+  max-height: calc(100dvh - var(--nav-h));
   overflow: hidden;
   padding: 10px 18px 12px;
   display: flex;

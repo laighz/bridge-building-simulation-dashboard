@@ -13,6 +13,7 @@
   --warn: #e8b84a;
   --hot: #ef6a4c;
   --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  --nav-h: 42px;
   font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
 }
 
@@ -31,7 +32,7 @@ body,
 
 body {
   min-height: 100dvh;
-  overflow: hidden;
+  overflow: auto;
 }
 
 button {
@@ -42,21 +43,4 @@ button {
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-}
-
-.coming-soon {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 48px;
-  max-width: 40rem;
-}
-
-.coming-soon h1 {
-  margin: 8px 0;
-}
-
-.coming-soon a {
-  color: var(--accent-2);
 }

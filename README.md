@@ -1,20 +1,22 @@
-# Brückenbau-Simulation — Timer-Dashboard
+# Brückenbau-Simulation
 
-Fullscreen-Anzeige für die Projekt-Simulation. Große Restzeit, Meilensteine und Phasen auf einem Beamer oder TV.
+Beamer-Timer und Workshop-Formulare für die Projekt-Simulation: Auftrag, Materialbestellung, Vor-/Nachkalkulation und Jury.
 
-## Ablauf (v1)
+## Ablauf
 
-Die Uhr startet bei **0:00**. Es gibt zwei Planungs-Abgaben, danach erst die Bauzeit:
+Die Uhr startet bei **0:00**. Zwei Planungs-Abgaben, danach die Bauzeit:
 
 | Zeitpunkt ab Start | Ereignis |
 | --- | --- |
 | **30 Min** | Vorkalkulation abgeben |
-| **45 Min** (gesamt) | Projektskizze abgeben |
+| **45 Min** (gesamt) | Projektskizze / Bauplan 1:10 abgeben |
 | **+ 90 Min** nach den 45 Min | Fertigstellung — Gesamtzeit **2:15 Stunden** |
 
 Phasenleiste: Vorbereitung → Auftrag → Planung → Realisierung → Abschluss.
 
-Fertige Phasen werden automatisch grün, die aktuelle Phase cyan. Pause und Lauf sind visuell getrennt (amber vs. Live-Punkt).
+Fertige Phasen werden grün, die aktuelle Phase cyan. Pause und Lauf sind visuell getrennt.
+
+Ausschluss, wenn die Brücke 1 kg nicht trägt oder die Nachkalkulation um mehr als **40 %** von der Vorkalkulation abweicht. Jury: je 0–10 Punkte für geringe Kosten, geringe Abweichung, Optik, Stabilität.
 
 ## Start
 
@@ -23,11 +25,20 @@ npm install
 npm run dev
 ```
 
-Browser: `http://localhost:5173/` — die Admin-Steuerung ist standardmäßig sichtbar.
+Browser: `http://localhost:5173/`
 
-Platzhalter-Routen: `/materials`, `/costing`, `/teams`.
+| Route | Inhalt |
+| --- | --- |
+| `/` | Timer |
+| `/brief` | Auftrag und Regeln |
+| `/materials` | Materialbestellung |
+| `/estimate` | Vorkalkulation |
+| `/actual` | Nachkalkulation |
+| `/jury` | Belastungstest, Kostenvergleich, Punkte |
 
-## Tasten
+Mengen und Jury-Werte bleiben in `localStorage` (`bridge-workshop`, `bridge-session`).
+
+## Tasten (Timer)
 
 | Taste | Aktion |
 | --- | --- |
@@ -37,4 +48,4 @@ Platzhalter-Routen: `/materials`, `/costing`, `/teams`.
 | `C` | Facilitator-Steuerung ausblenden/einblenden |
 | Esc | Steuerung schließen / Reset abbrechen |
 
-Zeiten in [`src/config/workshop.ts`](src/config/workshop.ts).
+Zeiten in [`src/config/workshop.ts`](src/config/workshop.ts), Preise in [`src/config/catalog.ts`](src/config/catalog.ts).
