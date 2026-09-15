@@ -42,7 +42,7 @@ export const rulesSlides: RulesSlide[] = [
   },
   {
     kicker: 'Kosten',
-    title: 'Jedes Packung zählt',
+    title: 'Jede Packung zählt',
     bullets: [
       'Material nur über die Bestellung',
       'Schere kaufen oder 30 Minuten mieten',
