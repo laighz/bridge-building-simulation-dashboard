@@ -16,7 +16,7 @@
 }
 
 .display.has-controls {
-  padding-bottom: 168px;
+  padding-bottom: 220px;
 }
 
 .topbar {
@@ -453,6 +453,57 @@
   margin: 2px 0 0;
   color: var(--muted);
   font-size: 0.78rem;
+}
+
+.controls-key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.controls-key input {
+  background: #151c27;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 5px 8px;
+  width: 180px;
+}
+
+.scissors-rail {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.scissors-chip {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(62, 198, 201, 0.12);
+  border: 1px solid var(--line);
+  font-size: 0.88rem;
+}
+
+.scissors-chip em {
+  font-style: normal;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+
+.scissors-chip.is-due {
+  background: rgba(239, 106, 76, 0.2);
+  color: #ffd0c6;
 }
 
 .urgency-warning .hero-time,

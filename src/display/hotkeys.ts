@@ -5,6 +5,8 @@ export type FacilitatorKeyAction =
   | 'cancelReset'
   | 'toggleControls'
   | 'toggleFullscreen'
+  | 'setupNext'
+  | 'setupPrev'
 
 type KeyEventLike = {
   key: string
@@ -21,7 +23,11 @@ function typingTarget(
 
 export function interpretFacilitatorKey(
   event: KeyEventLike,
-  options: { resetArmed: boolean; controlsVisible: boolean },
+  options: {
+    resetArmed: boolean
+    controlsVisible: boolean
+    setupActive?: boolean
+  },
 ): FacilitatorKeyAction | null {
   const target = typingTarget(event.target)
   const tag = target?.tagName
@@ -34,6 +40,24 @@ export function interpretFacilitatorKey(
     return null
   }
   if (event.repeat) return null
+
+  if (options.setupActive) {
+    if (event.key === 'Escape') {
+      if (options.resetArmed) return 'cancelReset'
+      return 'setupPrev'
+    }
+    if (
+      event.key === ' ' ||
+      event.key === 'Spacebar' ||
+      event.key === 'ArrowRight' ||
+      event.key === 'Enter'
+    ) {
+      return 'setupNext'
+    }
+    if (event.key === 'ArrowLeft') return 'setupPrev'
+    if (event.key === 'f' || event.key === 'F') return 'toggleFullscreen'
+    return null
+  }
 
   if (event.key === 'Escape') {
     if (options.resetArmed) return 'cancelReset'

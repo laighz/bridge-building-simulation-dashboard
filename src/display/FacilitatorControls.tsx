@@ -1,11 +1,17 @@
+import { playFuturisticCue, speakGerman } from '../audio/speech.ts'
 import { workshopConfig, type PhaseId } from '../config/workshop.ts'
+import { teamLabel, type Team } from '../domain/teams.ts'
 import { sessionStore } from '../store/browserStore.ts'
+import { workshopStore } from '../store/workshopStore.ts'
 import { toggleFullscreen } from './fullscreen.ts'
 
 type Props = {
   visible: boolean
   statusLabel: string
   activePhaseId: PhaseId
+  teams: Team[]
+  ttsApiKey: string
+  nowMs: number
   onSelectPhase: (phase: PhaseId | null) => void
 }
 
@@ -19,10 +25,18 @@ const JUMPS = [
   { label: 'Fertigstellung (45+90)', ms: 135 * 60_000 },
 ]
 
+function resetWorkshop() {
+  sessionStore.reset()
+  workshopStore.resetSessionExtras()
+}
+
 export function FacilitatorControls({
   visible,
   statusLabel,
   activePhaseId,
+  teams,
+  ttsApiKey,
+  nowMs,
   onSelectPhase,
 }: Props) {
   if (!visible) return null
@@ -37,7 +51,7 @@ export function FacilitatorControls({
         <button type="button" onClick={() => sessionStore.toggleRunning()}>
           Start / Pause
         </button>
-        <button type="button" onClick={() => sessionStore.reset()}>
+        <button type="button" onClick={resetWorkshop}>
           Reset
         </button>
         <button type="button" onClick={() => void toggleFullscreen()}>
@@ -69,6 +83,50 @@ export function FacilitatorControls({
             {jump.label}
           </button>
         ))}
+      </div>
+      <div className="controls-row wrap">
+        <span className="controls-status">Schere 30 Min</span>
+        {teams.length === 0 ? (
+          <span className="controls-status">Zuerst Teams anlegen</span>
+        ) : (
+          teams.map((team, index) => (
+            <button
+              key={team.id}
+              type="button"
+              onClick={() => workshopStore.startScissors(team.id, nowMs)}
+            >
+              {teamLabel(team, index)}
+            </button>
+          ))
+        )}
+      </div>
+      <div className="controls-row">
+        <label className="controls-key">
+          ElevenLabs
+          <input
+            type="password"
+            autoComplete="off"
+            placeholder="API-Key optional"
+            value={ttsApiKey}
+            onChange={(event) => workshopStore.setTtsApiKey(event.target.value)}
+          />
+        </label>
+        <button
+          type="button"
+          onClick={() => {
+            void speakGerman(
+              'Achtung. Stimme bereit. Die Schere muss zurück.',
+              {
+                elevenLabsKey:
+                  ttsApiKey || import.meta.env.VITE_ELEVENLABS_API_KEY,
+                voiceId: import.meta.env.VITE_ELEVENLABS_VOICE_ID,
+                playCue: () => playFuturisticCue(),
+              },
+            )
+          }}
+        >
+          Stimme testen
+        </button>
       </div>
       <p className="controls-help">
         Tasten: Leertaste Start/Pause · R Reset (zweimal) · F Fullscreen · C

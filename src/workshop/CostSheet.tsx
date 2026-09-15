@@ -3,6 +3,8 @@ import type { CatalogItem } from '../config/catalog.ts'
 import { lineTotal } from '../domain/costing.ts'
 import { formatEuro } from '../domain/money.ts'
 import { formatDuration } from '../domain/time.ts'
+import { teamLabel } from '../domain/teams.ts'
+import { useWorkshopData } from '../store/useWorkshopData.ts'
 import type { SheetId } from '../store/workshopStore.ts'
 import { workshopStore } from '../store/workshopStore.ts'
 
@@ -29,6 +31,7 @@ export function CostSheet({
   elapsedMs,
   children,
 }: Props) {
+  const { data } = useWorkshopData()
   const total = items.reduce(
     (sum, item) => sum + lineTotal(qty[item.id] ?? 0, item.unitPrice),
     0,
@@ -44,10 +47,27 @@ export function CostSheet({
         <div className="sheet-meta">
           <label>
             Gruppe
-            <input
-              value={groupName}
-              onChange={(event) => workshopStore.setGroupName(event.target.value)}
-            />
+            {data.teams.length > 0 ? (
+              <select
+                value={data.activeTeamId}
+                onChange={(event) =>
+                  workshopStore.setActiveTeam(event.target.value)
+                }
+              >
+                {data.teams.map((team, index) => (
+                  <option key={team.id} value={team.id}>
+                    {teamLabel(team, index)}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                value={groupName}
+                onChange={(event) =>
+                  workshopStore.setGroupName(event.target.value)
+                }
+              />
+            )}
           </label>
           <p>
             {timeLabel}:{' '}

@@ -49,4 +49,21 @@ describe('interpretFacilitatorKey', () => {
       ),
     ).toBe('toggleFullscreen')
   })
+
+  it('uses arrows and space to change setup slides instead of starting the timer', () => {
+    const opts = {
+      resetArmed: false,
+      controlsVisible: false,
+      setupActive: true,
+    }
+    expect(interpretFacilitatorKey({ key: ' ', repeat: false }, opts)).toBe(
+      'setupNext',
+    )
+    expect(
+      interpretFacilitatorKey({ key: 'ArrowRight', repeat: false }, opts),
+    ).toBe('setupNext')
+    expect(
+      interpretFacilitatorKey({ key: 'ArrowLeft', repeat: false }, opts),
+    ).toBe('setupPrev')
+  })
 })

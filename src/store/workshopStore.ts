@@ -1,5 +1,14 @@
 import { estimateItems, materialItems } from '../config/catalog.ts'
+import { appendSpoken } from '../domain/announce.ts'
+import { startScissorsForTeam, type ScissorsRental } from '../domain/scissors.ts'
 import { clampScore, type JuryScores } from '../domain/scoring.ts'
+import {
+  addTeam as appendTeam,
+  removeTeam as dropTeam,
+  renameTeam as relabelTeam,
+  type Team,
+} from '../domain/teams.ts'
+import type { SetupStep } from '../domain/setup.ts'
 import type { StorageLike } from './sessionStore.ts'
 
 const itemById = new Map(estimateItems.map((item) => [item.id, item]))
@@ -22,6 +31,13 @@ export type SheetId = 'order' | 'estimate' | 'actual'
 
 export type WorkshopData = {
   groupName: string
+  teams: Team[]
+  activeTeamId: string
+  setupStep: SetupStep
+  rulesSlideIndex: number
+  scissorsRentals: ScissorsRental[]
+  spokenKeys: string[]
+  ttsApiKey: string
   orderQty: Record<string, number>
   estimateQty: Record<string, number>
   actualQty: Record<string, number>
@@ -34,6 +50,13 @@ export type WorkshopData = {
 
 export const initialWorkshopData: WorkshopData = {
   groupName: '',
+  teams: [],
+  activeTeamId: '',
+  setupStep: 'teams',
+  rulesSlideIndex: 0,
+  scissorsRentals: [],
+  spokenKeys: [],
+  ttsApiKey: '',
   orderQty: {},
   estimateQty: { overhead: 1 },
   actualQty: { overhead: 1 },
@@ -57,13 +80,83 @@ function asQty(value: unknown): Record<string, number> {
   return result
 }
 
+function asTeams(value: unknown): Team[] {
+  if (!Array.isArray(value)) return []
+  const teams: Team[] = []
+  for (const raw of value) {
+    if (!raw || typeof raw !== 'object') continue
+    const item = raw as { id?: unknown; name?: unknown }
+    if (typeof item.id !== 'string' || !item.id) continue
+    teams.push({
+      id: item.id,
+      name: typeof item.name === 'string' ? item.name : '',
+    })
+  }
+  return teams
+}
+
+function asRentals(value: unknown): ScissorsRental[] {
+  if (!Array.isArray(value)) return []
+  const rentals: ScissorsRental[] = []
+  for (const raw of value) {
+    if (!raw || typeof raw !== 'object') continue
+    const item = raw as Partial<ScissorsRental>
+    if (
+      typeof item.id !== 'string' ||
+      typeof item.teamId !== 'string' ||
+      typeof item.startedAtMs !== 'number' ||
+      typeof item.durationMs !== 'number'
+    ) {
+      continue
+    }
+    rentals.push({
+      id: item.id,
+      teamId: item.teamId,
+      startedAtMs: item.startedAtMs,
+      durationMs: item.durationMs,
+    })
+  }
+  return rentals
+}
+
+function migrateTeams(data: Partial<WorkshopData>, groupName: string): Team[] {
+  const teams = asTeams(data.teams)
+  if (teams.length > 0) return teams
+  if (groupName.trim()) return [{ id: 'team-1', name: groupName }]
+  return []
+}
+
+function syncGroupName(teams: Team[], activeTeamId: string, fallback: string): string {
+  const active = teams.find((team) => team.id === activeTeamId) ?? teams[0]
+  return active?.name ?? fallback
+}
+
 function parseData(raw: string | null): WorkshopData | null {
   if (!raw) return null
   try {
     const data = JSON.parse(raw) as Partial<WorkshopData>
+    const groupName = typeof data.groupName === 'string' ? data.groupName : ''
+    const teams = migrateTeams(data, groupName)
+    const activeTeamId =
+      typeof data.activeTeamId === 'string' &&
+      teams.some((team) => team.id === data.activeTeamId)
+        ? data.activeTeamId
+        : (teams[0]?.id ?? '')
     return {
       ...initialWorkshopData,
-      groupName: typeof data.groupName === 'string' ? data.groupName : '',
+      groupName: syncGroupName(teams, activeTeamId, groupName),
+      teams,
+      activeTeamId,
+      setupStep: data.setupStep === 'rules' ? 'rules' : 'teams',
+      rulesSlideIndex:
+        typeof data.rulesSlideIndex === 'number' && data.rulesSlideIndex >= 0
+          ? Math.floor(data.rulesSlideIndex)
+          : 0,
+      scissorsRentals: asRentals(data.scissorsRentals),
+      spokenKeys: Array.isArray(data.spokenKeys)
+        ? data.spokenKeys.filter((key): key is string => typeof key === 'string')
+        : [],
+      ttsApiKey: typeof data.ttsApiKey === 'string' ? data.ttsApiKey : '',
       orderQty: asQty(data.orderQty),
       estimateQty: asQty(data.estimateQty),
       actualQty: asQty(data.actualQty),
@@ -100,6 +193,9 @@ export function createWorkshopStore(options: { storage?: StorageLike }) {
   let state: WorkshopData =
     parseData(storage?.getItem(DEFAULT_KEY) ?? null) ?? {
       ...initialWorkshopData,
+      teams: [],
+      scissorsRentals: [],
+      spokenKeys: [],
       orderQty: { ...initialWorkshopData.orderQty },
       estimateQty: { ...initialWorkshopData.estimateQty },
       actualQty: { ...initialWorkshopData.actualQty },
@@ -113,6 +209,17 @@ export function createWorkshopStore(options: { storage?: StorageLike }) {
     for (const listener of listeners) listener()
   }
 
+  function withTeams(teams: Team[], activeTeamId = state.activeTeamId): WorkshopData {
+    const nextActive =
+      teams.some((team) => team.id === activeTeamId) ? activeTeamId : (teams[0]?.id ?? '')
+    return {
+      ...state,
+      teams,
+      activeTeamId: nextActive,
+      groupName: syncGroupName(teams, nextActive, ''),
+    }
+  }
+
   return {
     getState(): WorkshopData {
       return state
@@ -124,7 +231,61 @@ export function createWorkshopStore(options: { storage?: StorageLike }) {
       }
     },
     setGroupName(groupName: string) {
-      commit({ ...state, groupName })
+      if (state.teams.length === 0) {
+        const teams = [{ id: 'team-1', name: groupName }]
+        commit({
+          ...state,
+          teams,
+          activeTeamId: 'team-1',
+          groupName,
+        })
+        return
+      }
+      const id = state.activeTeamId || state.teams[0]!.id
+      commit(withTeams(relabelTeam(state.teams, id, groupName), id))
+    },
+    addTeam() {
+      const teams = appendTeam(state.teams)
+      const created = teams[teams.length - 1]
+      commit(withTeams(teams, created?.id ?? state.activeTeamId))
+    },
+    removeTeam(id: string) {
+      commit(withTeams(dropTeam(state.teams, id)))
+    },
+    renameTeam(id: string, name: string) {
+      commit(withTeams(relabelTeam(state.teams, id, name), id))
+    },
+    setActiveTeam(id: string) {
+      if (!state.teams.some((team) => team.id === id)) return
+      commit(withTeams(state.teams, id))
+    },
+    setSetupStep(setupStep: SetupStep, rulesSlideIndex = state.rulesSlideIndex) {
+      commit({ ...state, setupStep, rulesSlideIndex })
+    },
+    setRulesSlideIndex(rulesSlideIndex: number) {
+      commit({ ...state, rulesSlideIndex: Math.max(0, rulesSlideIndex) })
+    },
+    startScissors(teamId: string, nowMs: number) {
+      if (!state.teams.some((team) => team.id === teamId)) return
+      commit({
+        ...state,
+        scissorsRentals: startScissorsForTeam(state.scissorsRentals, teamId, nowMs),
+      })
+    },
+    markSpoken(key: string) {
+      commit({ ...state, spokenKeys: appendSpoken(state.spokenKeys, key) })
+    },
+    setTtsApiKey(ttsApiKey: string) {
+      commit({ ...state, ttsApiKey })
+    },
+    resetSessionExtras() {
+      commit({
+        ...state,
+        setupStep: 'teams',
+        rulesSlideIndex: 0,
+        scissorsRentals: [],
+        spokenKeys: [],
+      })
     },
     setQuantity(sheet: SheetId, itemId: string, quantity: number) {
       const key = qtyKey(sheet)

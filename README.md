@@ -49,3 +49,9 @@ Mengen und Jury-Werte bleiben in `localStorage` (`bridge-workshop`, `bridge-sess
 | Esc | Steuerung schließen / Reset abbrechen |
 
 Zeiten in [`src/config/workshop.ts`](src/config/workshop.ts), Preise in [`src/config/catalog.ts`](src/config/catalog.ts).
+
+## Setup vor dem Timer
+
+Solange die Uhr idle ist, startet `/` mit der Team-Übersicht (Bento, Plus-Kachel) und danach Regel-Folien. Klick links zurück, rechts vor; auf der letzten Folie startet rechts den Timer.
+
+Scheren-Miete: in der Facilitator-Steuerung **Schere 30 Min** für ein Team. Abgelaufene Workshop-Meilensteine und Scheren-Rückgaben werden auf Deutsch angesagt (ElevenLabs, wenn `VITE_ELEVENLABS_API_KEY` oder das Key-Feld gesetzt ist, sonst die Browser-Stimme).

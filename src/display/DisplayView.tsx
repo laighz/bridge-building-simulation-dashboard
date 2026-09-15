@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { workshopConfig } from '../config/workshop.ts'
 import { formatDuration, formatOvertime } from '../domain/time.ts'
+import { useWorkshopData } from '../store/useWorkshopData.ts'
+import { workshopStore } from '../store/workshopStore.ts'
 import { nextDeadlineCopy } from './deadlineCopy.ts'
 import { FacilitatorControls } from './FacilitatorControls.tsx'
 import { toggleFullscreen } from './fullscreen.ts'
@@ -8,6 +10,7 @@ import { interpretFacilitatorKey } from './hotkeys.ts'
 import { MilestoneCards } from './MilestoneCards.tsx'
 import { phaseLabel } from './phaseLabel.ts'
 import { PhaseStepper } from './PhaseStepper.tsx'
+import { ScissorsRail } from './ScissorsRail.tsx'
 import { Timeline } from './Timeline.tsx'
 import { useWorkshopSession } from './useWorkshopSession.ts'
 import './DisplayView.css'
@@ -22,6 +25,7 @@ function wallClock(nowMs: number): string {
 
 export function DisplayView() {
   const { state, view, nowMs, store } = useWorkshopSession()
+  const { data } = useWorkshopData()
   const [controlsVisible, setControlsVisible] = useState(true)
   const [resetArmed, setResetArmed] = useState(false)
 
@@ -43,6 +47,7 @@ export function DisplayView() {
       if (action === 'armReset') setResetArmed(true)
       if (action === 'confirmReset') {
         store.reset()
+        workshopStore.resetSessionExtras()
         setResetArmed(false)
       }
       if (action === 'cancelReset') setResetArmed(false)
@@ -128,6 +133,11 @@ export function DisplayView() {
           </p>
         ) : null}
         <MilestoneCards milestones={view.milestones} />
+        <ScissorsRail
+          rentals={data.scissorsRentals}
+          teams={data.teams}
+          nowMs={nowMs}
+        />
         <Timeline elapsedMs={view.elapsedMs} progress={view.progress} />
       </main>
 
@@ -135,6 +145,9 @@ export function DisplayView() {
         visible={controlsVisible}
         statusLabel={`${statusLabel} · Phase ${phaseLabel(view.activePhaseId)}`}
         activePhaseId={view.activePhaseId}
+        teams={data.teams}
+        ttsApiKey={data.ttsApiKey}
+        nowMs={nowMs}
         onSelectPhase={(phase) => store.setPhaseOverride(phase)}
       />
     </div>

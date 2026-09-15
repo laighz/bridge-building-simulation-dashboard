@@ -41,6 +41,7 @@ describe('workshopStore', () => {
     })
     expect(store.getState().groupName).toBe('Team Rot')
     expect(store.getState().orderQty['carton-1']).toBe(1)
+    expect(store.getState().teams[0]?.name).toBe('Team Rot')
   })
 
   it('clamps limited stock such as scissors to maxQty', () => {
@@ -74,5 +75,22 @@ describe('workshopStore', () => {
       looks: 7,
       stability: 10,
     })
+  })
+
+  it('adds named teams from the bento and starts a 30-minute scissors rental', () => {
+    const store = createWorkshopStore({ storage: memoryStorage() })
+    store.addTeam()
+    store.renameTeam(store.getState().teams[0]!.id, 'Cyan')
+    store.startScissors(store.getState().teams[0]!.id, 5_000)
+    expect(store.getState().teams[0]?.name).toBe('Cyan')
+    expect(store.getState().scissorsRentals).toHaveLength(1)
+    expect(store.getState().scissorsRentals[0]?.startedAtMs).toBe(5_000)
+  })
+
+  it('records spoken announcement keys so a timer is not announced twice', () => {
+    const store = createWorkshopStore({ storage: memoryStorage() })
+    store.markSpoken('milestone:vorkalkulation')
+    store.markSpoken('milestone:vorkalkulation')
+    expect(store.getState().spokenKeys).toEqual(['milestone:vorkalkulation'])
   })
 })

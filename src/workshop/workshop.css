@@ -37,6 +37,7 @@
 }
 
 .sheet-meta input,
+.sheet-meta select,
 .sheet-table input,
 .jury-page input {
   background: #151c27;
