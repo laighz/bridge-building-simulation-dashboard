@@ -1,5 +1,5 @@
 import { estimateItems } from '../config/catalog.ts'
-import { totalMinutes, workshopConfig } from '../config/workshop.ts'
+import { totalMinutes } from '../config/workshop.ts'
 import {
   costDeviationPercent,
   isExcludedByCost,
@@ -10,7 +10,11 @@ import { elapsedMs } from '../domain/session.ts'
 import { formatEuro } from '../domain/money.ts'
 import { useWorkshopSession } from '../display/useWorkshopSession.ts'
 import { useWorkshopData } from '../store/useWorkshopData.ts'
-import { workshopStore } from '../store/workshopStore.ts'
+import {
+  getTeamSheets,
+  getTeamSubmit,
+  workshopStore,
+} from '../store/workshopStore.ts'
 import { CostSheet } from './CostSheet.tsx'
 import './workshop.css'
 
@@ -20,16 +24,14 @@ type Props = {
 
 export function EstimatePage({ mode }: Props) {
   const { data } = useWorkshopData()
-  const { state, nowMs } = useWorkshopSession()
+  const { state, nowMs, config } = useWorkshopSession()
   const elapsed = elapsedMs(state, nowMs)
-  const plannedMs = totalMinutes(workshopConfig) * 60_000
-  const qty = mode === 'estimate' ? data.estimateQty : data.actualQty
-  const submitted =
-    mode === 'estimate'
-      ? data.estimateSubmittedElapsedMs
-      : data.actualSubmittedElapsedMs
-  const plannedTotal = sheetTotal(estimateItems, data.estimateQty)
-  const actualTotal = sheetTotal(estimateItems, data.actualQty)
+  const plannedMs = totalMinutes(config) * 60_000
+  const sheets = getTeamSheets(data, data.activeTeamId)
+  const qty = mode === 'estimate' ? sheets.estimate : sheets.actual
+  const submitted = getTeamSubmit(data, data.activeTeamId, mode)
+  const plannedTotal = sheetTotal(estimateItems, sheets.estimate)
+  const actualTotal = sheetTotal(estimateItems, sheets.actual)
   const deviation = costDeviationPercent(plannedTotal, actualTotal)
 
   return (
@@ -45,14 +47,24 @@ export function EstimatePage({ mode }: Props) {
         elapsedMs={elapsed}
       >
         {mode === 'actual' ? (
-          <button
-            type="button"
-            onClick={() =>
-              workshopStore.copyMaterialQuantities('order', 'actual')
-            }
-          >
-            Materialmengen aus Bestellung übernehmen
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() =>
+                workshopStore.copyMaterialQuantities('order', 'actual')
+              }
+            >
+              Materialmengen aus Bestellung übernehmen
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                workshopStore.copySheetQuantities('estimate', 'actual')
+              }
+            >
+              Werte aus Vorkalkulation übernehmen
+            </button>
+          </>
         ) : (
           <button
             type="button"

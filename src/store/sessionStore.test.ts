@@ -136,4 +136,95 @@ describe('sessionStore', () => {
     expect(store.getState()).toEqual(initialSessionState)
     expect(storage.getItem('bridge-session')).toBeNull()
   })
+
+  it('stores timing overrides and persists them', () => {
+    const storage = memoryStorage()
+    const store = createSessionStore({ now: () => 0, storage })
+    store.setTimingOverrides({ planningMinutes: 30, warningMinutes: 10 })
+    expect(store.getState().timingOverrides).toEqual({
+      planningMinutes: 30,
+      warningMinutes: 10,
+    })
+    const persisted = JSON.parse(storage.getItem('bridge-session') ?? '{}')
+    expect(persisted.timingOverrides).toEqual({
+      planningMinutes: 30,
+      warningMinutes: 10,
+    })
+  })
+
+  it('sanitizes timing overrides on set', () => {
+    const store = createSessionStore({ now: () => 0, storage: memoryStorage() })
+    store.setTimingOverrides({
+      planningMinutes: -5,
+      realizationMinutes: Number.NaN,
+      estimateDueMinute: Number.POSITIVE_INFINITY,
+      warningMinutes: 8,
+    })
+    expect(store.getState().timingOverrides).toEqual({ warningMinutes: 8 })
+  })
+
+  it('resetTimingOverrides restores the defaults', () => {
+    const storage = memoryStorage()
+    const store = createSessionStore({ now: () => 0, storage })
+    store.setTimingOverrides({ planningMinutes: 30 })
+    store.resetTimingOverrides()
+    expect(store.getState().timingOverrides).toEqual({})
+    const persisted = JSON.parse(storage.getItem('bridge-session') ?? '{}')
+    expect(persisted.timingOverrides).toEqual({})
+  })
+
+  it('dispatch setTimingOverrides/resetTimingOverrides match the methods', () => {
+    const store = createSessionStore({ now: () => 0, storage: memoryStorage() })
+    store.dispatch({
+      type: 'setTimingOverrides',
+      overrides: { realizationMinutes: 60 },
+    })
+    expect(store.getState().timingOverrides).toEqual({
+      realizationMinutes: 60,
+    })
+    store.dispatch({ type: 'resetTimingOverrides' })
+    expect(store.getState().timingOverrides).toEqual({})
+  })
+
+  it('restores persisted timing overrides tolerantly', () => {
+    const persisted = JSON.stringify({
+      status: 'paused',
+      startedAtMs: null,
+      elapsedMsAtPause: 0,
+      phaseOverride: null,
+      timingOverrides: {
+        planningMinutes: 30,
+        realizationMinutes: 'bald',
+        briefingMinutes: -3,
+        estimateDueMinute: 25,
+        warningMinutes: null,
+        criticalMinutes: 2,
+        bogus: 99,
+      },
+    })
+    const store = createSessionStore({
+      now: () => 0,
+      storage: memoryStorage({ 'bridge-session': persisted }),
+    })
+    expect(store.getState().timingOverrides).toEqual({
+      planningMinutes: 30,
+      estimateDueMinute: 25,
+      criticalMinutes: 2,
+    })
+  })
+
+  it('treats a non-object timingOverrides as empty', () => {
+    const persisted = JSON.stringify({
+      status: 'idle',
+      startedAtMs: null,
+      elapsedMsAtPause: 0,
+      phaseOverride: null,
+      timingOverrides: 42,
+    })
+    const store = createSessionStore({
+      now: () => 0,
+      storage: memoryStorage({ 'bridge-session': persisted }),
+    })
+    expect(store.getState().timingOverrides).toEqual({})
+  })
 })

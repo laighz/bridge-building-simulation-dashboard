@@ -2,7 +2,11 @@ import {
   initialSessionState,
   type SessionState,
 } from '../domain/session.ts'
-import type { PhaseId } from '../config/workshop.ts'
+import {
+  sanitizeTimingOverrides,
+  type PhaseId,
+  type TimingOverrides,
+} from '../config/workshop.ts'
 
 export type StorageLike = {
   getItem(key: string): string | null
@@ -17,6 +21,8 @@ export type SessionAction =
   | { type: 'toggleRunning' }
   | { type: 'setPhaseOverride'; phase: PhaseId | null }
   | { type: 'jumpToElapsedMs'; elapsedMs: number }
+  | { type: 'setTimingOverrides'; overrides: TimingOverrides }
+  | { type: 'resetTimingOverrides' }
 
 const DEFAULT_KEY = 'bridge-session'
 
@@ -59,6 +65,7 @@ function parseState(raw: string | null): SessionState | null {
       startedAtMs: data.startedAtMs ?? null,
       elapsedMsAtPause: data.elapsedMsAtPause,
       phaseOverride: data.phaseOverride ?? null,
+      timingOverrides: sanitizeTimingOverrides(data.timingOverrides),
     }
   } catch {
     return null
@@ -134,12 +141,23 @@ export function createSessionStore(options: {
     else start()
   }
 
+  function setTimingOverrides(overrides: TimingOverrides) {
+    commit({ ...state, timingOverrides: sanitizeTimingOverrides(overrides) })
+  }
+
+  function resetTimingOverrides() {
+    commit({ ...state, timingOverrides: {} })
+  }
+
   function dispatch(action: SessionAction) {
     if (action.type === 'start') start()
     else if (action.type === 'pause') pause()
     else if (action.type === 'reset') reset()
     else if (action.type === 'toggleRunning') toggleRunning()
     else if (action.type === 'setPhaseOverride') setPhaseOverride(action.phase)
+    else if (action.type === 'setTimingOverrides') {
+      setTimingOverrides(action.overrides)
+    } else if (action.type === 'resetTimingOverrides') resetTimingOverrides()
     else jumpToElapsedMs(action.elapsedMs)
   }
 
@@ -160,6 +178,8 @@ export function createSessionStore(options: {
     setPhaseOverride,
     jumpToElapsedMs,
     toggleRunning,
+    setTimingOverrides,
+    resetTimingOverrides,
   }
 }
 

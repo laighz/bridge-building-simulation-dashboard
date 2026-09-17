@@ -17,6 +17,16 @@
   margin-inline: auto;
 }
 
+.sheet,
+.cost-delta {
+  width: min(var(--container), 100%);
+}
+
+.sheet-teamname {
+  margin-bottom: var(--space-5);
+  max-width: 420px;
+}
+
 .sheet-head,
 .brief-head {
   display: flex;
@@ -34,15 +44,6 @@
   letter-spacing: -0.03em;
   line-height: 1.12;
   text-wrap: balance;
-}
-
-.brief-lead {
-  margin: 8px 0 0;
-  max-width: 46rem;
-  color: var(--ink-secondary);
-  font-size: 1.05rem;
-  line-height: 1.5;
-  text-wrap: pretty;
 }
 
 .sheet-meta {
@@ -97,6 +98,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--bg-elevated);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--accent) 7%, rgba(3, 10, 14, 0.5));
 }
 
 .sheet-table {
@@ -104,10 +106,32 @@
   border-collapse: collapse;
 }
 
+/* Desktop: feste Spaltengeometrie — Zahlen dürfen das Layout nie verschieben */
+@media (min-width: 721px) {
+  .sheet-table {
+    table-layout: fixed;
+  }
+
+  .sheet-table th:nth-child(2),
+  .sheet-table td:nth-child(2) {
+    width: 190px;
+  }
+
+  .sheet-table th:nth-child(3),
+  .sheet-table td:nth-child(3) {
+    width: 290px;
+  }
+
+  .sheet-table th:nth-child(4),
+  .sheet-table td:nth-child(4) {
+    width: 210px;
+  }
+}
+
 .sheet-table th,
 .sheet-table td {
   border-bottom: 1px solid var(--line);
-  padding: 12px 14px;
+  padding: 16px 18px;
   text-align: start;
 }
 
@@ -132,13 +156,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+.sheet-table td:nth-child(2),
+.sheet-table td:nth-child(4) {
+  font-size: 1.05rem;
+}
+
+.sheet-table td:nth-child(4) {
+  font-weight: 600;
+}
+
 .sheet-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
 .sheet-table tfoot th {
   color: var(--ink);
-  font-size: 1.05rem;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
   border-bottom: 0;
   background: color-mix(in srgb, var(--bg-surface) 80%, black);
 }
@@ -146,19 +180,19 @@
 .qty-control {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   justify-content: flex-end;
 }
 
 .qty-btn {
-  width: var(--hit);
-  min-width: var(--hit);
-  min-height: var(--hit);
+  width: var(--hit-l);
+  min-width: var(--hit-l);
+  min-height: var(--hit-l);
   border-radius: var(--radius-control);
   border: 1px solid var(--line);
   background: var(--bg-surface);
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   line-height: 1;
 }
 
@@ -170,10 +204,13 @@
 
 .sheet-table input[type='number'],
 .sheet-qty {
-  width: 4.75rem;
-  text-align: end;
-  min-height: var(--hit);
-  padding: 8px;
+  width: 6rem;
+  text-align: center;
+  min-height: var(--hit-l);
+  padding: 8px 10px;
+  font-size: var(--text-title);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .cost-delta {
@@ -238,53 +275,6 @@
   color: #b7e8bc;
 }
 
-.jury-actions button.danger {
-  background: color-mix(in srgb, var(--hot) 22%, transparent);
-  border-color: var(--hot);
-  color: #ffd0c6;
-}
-
-.jury-actions button.danger.is-pressed,
-.jury-actions button.primary.is-pressed {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
-}
-
-.jury-scores {
-  margin-top: var(--space-5);
-}
-
-.jury-scores .brief-card {
-  min-width: min(100%, 260px);
-}
-
-.jury-scores .score-hint {
-  color: var(--muted);
-  font-size: var(--text-caption);
-  font-weight: 400;
-}
-
-.score-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.jury-page input.score-value {
-  width: 4.5rem;
-  min-width: 4.5rem;
-  min-height: var(--hit);
-  text-align: center;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.8rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  background: var(--bg-surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  padding: 4px;
-}
-
 .sheet-actions {
   position: fixed;
   inset-inline: 0;
@@ -295,8 +285,8 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   margin-top: 0;
-  padding: 12px max(16px, calc((100vw - 1120px) / 2))
-    calc(12px + env(safe-area-inset-bottom));
+  padding: 14px max(16px, calc((100vw - var(--container)) / 2))
+    calc(14px + env(safe-area-inset-bottom));
   background: var(--bg);
   border-top: 1px solid var(--line);
 }
@@ -313,13 +303,6 @@
     background: var(--bg);
     backdrop-filter: none;
   }
-}
-
-.jury-actions {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-  flex-wrap: wrap;
 }
 
 .sheet-actions button,
@@ -342,68 +325,25 @@
   font-weight: 600;
 }
 
+.sheet-actions button {
+  min-height: var(--hit-l);
+  padding: 12px 22px;
+  font-size: var(--text-body);
+}
+
+.sheet-actions button.primary {
+  padding-inline: 34px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 32%, rgba(3, 10, 14, 0.45));
+}
+
 @media (hover: hover) {
   .sheet-actions button:hover,
   .jury-actions button:hover,
   .qty-btn:hover:not(:disabled) {
     border-color: var(--line-strong);
   }
-}
-
-.brief-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-4);
-}
-
-.brief-card {
-  background: var(--bg-elevated);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  padding: 18px 20px;
-}
-
-.brief-card h2 {
-  margin: 0 0 8px;
-  font-size: 1.08rem;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-}
-
-.brief-card p,
-.brief-card li {
-  color: var(--ink-secondary);
-  line-height: 1.5;
-  text-wrap: pretty;
-}
-
-.brief-card ul {
-  margin: 0;
-  padding-inline-start: 1.1rem;
-}
-
-.brief-card li {
-  margin: 4px 0;
-}
-
-.jury-compare {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-3);
-  margin: 16px auto;
-}
-
-.jury-page .brief-head,
-.jury-page .jury-actions,
-.jury-page .pending-banner,
-.jury-page .disqualified,
-.jury-page .ok-banner {
-  width: min(1120px, 100%);
-  margin-inline: auto;
-}
-
-.jury-page .brief-head {
-  margin-bottom: var(--space-4);
 }
 
 @media (max-width: 720px) {

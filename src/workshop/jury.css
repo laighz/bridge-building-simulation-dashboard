@@ -1,0 +1,387 @@
+/* Jury-Seite: Team-Auswahl, Status, Kalkulationsprüfung, Bewertung.
+   Ein Panel = eine Surface; Zeilen statt verschachtelter Karten. */
+
+.jury-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  transition: background var(--dur-ui) var(--ease-out);
+}
+
+/* Ausgeschlossen: Seitenhintergrund läuft rot aus (wie Pause-Gradient am Timer) */
+.jury-page.is-failed {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--hot) 16%, var(--bg)) 0%,
+    var(--bg) 42%
+  );
+}
+
+/* Im Rennen: Seitenhintergrund läuft grün aus */
+.jury-page.is-approved {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ok) 14%, var(--bg)) 0%,
+    var(--bg) 42%
+  );
+}
+
+.jury-page > * {
+  width: min(var(--container), 100%);
+  margin-inline: auto;
+}
+
+.jury-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.jury-lead {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--ink-secondary);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* --- Status-Banner ------------------------------------------------------- */
+
+.jury-status {
+  margin-block: 0;
+  padding: 14px 20px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  font-size: var(--text-body-l);
+  font-weight: 500;
+  text-align: center;
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out),
+    box-shadow var(--dur-ui) var(--ease-out);
+}
+
+.jury-status strong {
+  font-weight: 700;
+}
+
+.jury-status.is-ok {
+  background: color-mix(in srgb, var(--ok) 14%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--line));
+  color: #b7e8bc;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--ok) 14%, transparent);
+}
+
+.jury-status.is-pending {
+  background: color-mix(in srgb, var(--warn) 13%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  color: #f3ddb0;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--warn) 12%, transparent);
+}
+
+.jury-status.is-hot {
+  background: color-mix(in srgb, var(--hot) 15%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--hot) 48%, var(--line));
+  color: #ffd0c6;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--hot) 16%, transparent);
+}
+
+/* --- Panel --------------------------------------------------------------- */
+
+.jury-panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  padding: clamp(22px, 3vw, 36px);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.jury-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4) var(--space-6);
+  flex-wrap: wrap;
+}
+
+.jury-panel-head h2 {
+  margin: 0;
+  font-size: var(--text-title);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.jury-panel-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: var(--text-ui);
+  text-wrap: pretty;
+}
+
+/* --- Kalkulationsprüfung ------------------------------------------------- */
+
+.jury-calc-rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.jury-calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.jury-calc-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.jury-calc-row dt {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: var(--text-body-l);
+}
+
+.jury-calc-row dd {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* --- Urteil -------------------------------------------------------------- */
+
+.jury-verdict {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 24px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out),
+    box-shadow var(--dur-ui) var(--ease-out);
+}
+
+.jury-verdict strong {
+  font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.jury-verdict span {
+  color: var(--ink-secondary);
+  font-size: var(--text-body-l);
+}
+
+.jury-verdict.is-ok {
+  background: color-mix(in srgb, var(--ok) 15%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--ok) 50%, var(--line));
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--ok) 18%, transparent);
+}
+
+.jury-verdict.is-ok strong {
+  color: var(--ok);
+}
+
+.jury-verdict.is-hot {
+  background: color-mix(in srgb, var(--hot) 16%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--hot) 52%, var(--line));
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--hot) 20%, transparent);
+}
+
+.jury-verdict.is-hot strong {
+  color: var(--hot);
+}
+
+.jury-verdict.is-pending {
+  background: color-mix(in srgb, var(--warn) 13%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--warn) 45%, var(--line));
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--warn) 13%, transparent);
+}
+
+.jury-verdict.is-pending strong {
+  color: var(--warn);
+}
+
+.jury-verdict.is-muted {
+  background: var(--bg-surface);
+  border-color: var(--line);
+}
+
+.jury-verdict.is-muted strong {
+  color: var(--ink-secondary);
+}
+
+/* --- Belastungstest ------------------------------------------------------ */
+
+.jury-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.jury-actions button {
+  min-height: var(--hit-l);
+  padding: 12px 24px;
+  font-size: var(--text-body-l);
+}
+
+.jury-actions button.is-pressed {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 10px 24px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* Danger-Färbung nur im aktiven Zustand — inaktiv sieht der Button neutral aus */
+.jury-actions button.danger.is-pressed {
+  background: color-mix(in srgb, var(--hot) 22%, transparent);
+  border-color: var(--hot);
+  color: #ffd0c6;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--hot) 60%, transparent),
+    0 10px 24px color-mix(in srgb, var(--hot) 20%, transparent);
+}
+
+/* --- Jury-Bewertung ------------------------------------------------------ */
+
+.jury-total {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--muted);
+  font-size: var(--text-body-l);
+  font-variant-numeric: tabular-nums;
+}
+
+.jury-total strong {
+  color: var(--ink);
+  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.jury-score-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.jury-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.jury-score-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.jury-score-row:last-child {
+  padding-bottom: 0;
+}
+
+.jury-score-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: var(--text-body-l);
+  font-weight: 600;
+}
+
+.jury-score-hint {
+  color: var(--muted);
+  font-size: var(--text-caption);
+  font-weight: 400;
+}
+
+.jury-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.jury-step-btn {
+  width: var(--hit-l);
+  min-width: var(--hit-l);
+  min-height: var(--hit-l);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
+  cursor: pointer;
+  font-size: 1.7rem;
+  line-height: 1;
+  transition:
+    scale var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.jury-score-value {
+  min-width: 3.75rem;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* --- Interaktion --------------------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .jury-step-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    border-color: var(--line-strong);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .jury-actions button:hover:not(:disabled) {
+    border-color: var(--line-strong);
+  }
+}
+
+.jury-step-btn:focus-visible,
+.jury-actions button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* --- Schmale Bildschirme ------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .jury-score-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jury-stepper {
+    justify-content: space-between;
+  }
+
+  .jury-calc-row dd {
+    white-space: normal;
+    text-align: end;
+  }
+}

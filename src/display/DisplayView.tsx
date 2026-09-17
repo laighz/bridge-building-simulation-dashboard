@@ -8,7 +8,6 @@ import { FacilitatorControls } from './FacilitatorControls.tsx'
 import { toggleFullscreen } from './fullscreen.ts'
 import { interpretFacilitatorKey } from './hotkeys.ts'
 import { MilestoneCards } from './MilestoneCards.tsx'
-import { phaseLabel } from './phaseLabel.ts'
 import { PhaseStepper } from './PhaseStepper.tsx'
 import { ScissorsRail } from './ScissorsRail.tsx'
 import { Timeline } from './Timeline.tsx'
@@ -109,11 +108,17 @@ export function DisplayView() {
       </header>
 
       <main className="stage">
-        {state.status === 'paused' ? (
-          <p className="pause-banner" role="status">
-            Pausiert — Uhr steht. Leertaste zum Fortsetzen.
-          </p>
-        ) : null}
+        <p
+          className={
+            state.status === 'paused'
+              ? 'pause-banner is-visible'
+              : 'pause-banner'
+          }
+          role="status"
+          aria-hidden={state.status !== 'paused'}
+        >
+          Pausiert — Uhr steht. Leertaste zum Fortsetzen.
+        </p>
         {resetArmed ? (
           <p className="reset-banner" role="status">
             Nochmal R drücken, um zurückzusetzen
@@ -135,7 +140,6 @@ export function DisplayView() {
 
       <FacilitatorControls
         visible={controlsVisible}
-        statusLabel={`${statusLabel} · ${phaseLabel(view.activePhaseId)}`}
         activePhaseId={view.activePhaseId}
         teams={data.teams}
         ttsApiKey={data.ttsApiKey}

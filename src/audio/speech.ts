@@ -3,10 +3,10 @@ export type VoiceLike = {
   name: string
 }
 
-export const FUTURISTIC_UTTERANCE = {
+export const NATURAL_UTTERANCE = {
   lang: 'de-DE',
-  rate: 0.86,
-  pitch: 0.68,
+  rate: 0.98,
+  pitch: 1.0,
 }
 
 export const ELEVENLABS_DEFAULT_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb'
@@ -22,6 +22,9 @@ export type ElevenLabsPayload = {
   }
 }
 
+// Prefer the most natural-sounding German voice the browser offers:
+// 1) voices labeled "natural"/"neural", 2) high-quality brands or tiers
+// (Google, online, enhanced, premium), 3) the first German voice.
 export function pickGermanVoice(voices: VoiceLike[]): VoiceLike | null {
   if (voices.length === 0) return null
   const german = voices.filter(
@@ -30,7 +33,8 @@ export function pickGermanVoice(voices: VoiceLike[]): VoiceLike | null {
   )
   const pool = german.length > 0 ? german : voices
   return (
-    pool.find((voice) => /google|neural|natural|online/i.test(voice.name)) ??
+    pool.find((voice) => /natural|neural/i.test(voice.name)) ??
+    pool.find((voice) => /google|online|enhanced|premium/i.test(voice.name)) ??
     pool[0] ??
     null
   )
@@ -58,7 +62,6 @@ type SpeakDeps = {
   voiceId?: string
   fetchImpl?: typeof fetch
   synth?: Pick<SpeechSynthesis, 'speak' | 'cancel' | 'getVoices'>
-  playCue?: () => Promise<void>
   playAudio?: (buffer: ArrayBuffer) => Promise<void>
 }
 
@@ -68,9 +71,9 @@ async function speakBrowser(
 ): Promise<void> {
   if (typeof SpeechSynthesisUtterance === 'undefined') return
   const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = FUTURISTIC_UTTERANCE.lang
-  utterance.rate = FUTURISTIC_UTTERANCE.rate
-  utterance.pitch = FUTURISTIC_UTTERANCE.pitch
+  utterance.lang = NATURAL_UTTERANCE.lang
+  utterance.rate = NATURAL_UTTERANCE.rate
+  utterance.pitch = NATURAL_UTTERANCE.pitch
   const voice = pickGermanVoice(synth.getVoices())
   if (voice && 'voiceURI' in (voice as object)) {
     utterance.voice = voice as SpeechSynthesisVoice
@@ -111,7 +114,6 @@ export async function speakGerman(
   text: string,
   deps: SpeakDeps = {},
 ): Promise<void> {
-  await deps.playCue?.()
   const key = deps.elevenLabsKey?.trim()
   if (key) {
     try {
@@ -147,42 +149,4 @@ export async function speakGerman(
     (typeof speechSynthesis === 'undefined' ? undefined : speechSynthesis)
   if (!synth) return
   await speakBrowser(text, synth)
-}
-
-export function playFuturisticCue(
-  contextCtor?: typeof AudioContext,
-): Promise<void> {
-  const Ctor =
-    contextCtor ??
-    (typeof AudioContext === 'undefined' ? undefined : AudioContext)
-  if (!Ctor) return Promise.resolve()
-  const context = new Ctor()
-  const now = context.currentTime
-  const master = context.createGain()
-  master.gain.value = 0.07
-  master.connect(context.destination)
-  const notes = [
-    { freq: 932, at: 0, dur: 0.09 },
-    { freq: 1244, at: 0.08, dur: 0.12 },
-    { freq: 1864, at: 0.18, dur: 0.16 },
-  ]
-  for (const note of notes) {
-    const osc = context.createOscillator()
-    const gain = context.createGain()
-    osc.type = 'triangle'
-    osc.frequency.value = note.freq
-    gain.gain.setValueAtTime(0.0001, now + note.at)
-    gain.gain.exponentialRampToValueAtTime(1, now + note.at + 0.02)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + note.at + note.dur)
-    osc.connect(gain)
-    gain.connect(master)
-    osc.start(now + note.at)
-    osc.stop(now + note.at + note.dur + 0.02)
-  }
-  return new Promise((resolve) => {
-    window.setTimeout(() => {
-      void context.close()
-      resolve()
-    }, 420)
-  })
 }

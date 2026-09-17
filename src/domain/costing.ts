@@ -28,9 +28,27 @@ export function costDeviationPercent(
   return ((actual - planned) / Math.abs(planned)) * 100
 }
 
-export function isExcludedByCost(planned: number, actual: number): boolean {
+export type CostDeviationVerdict = {
+  /** Percent deviation of Nach- vs Vorkalkulation; null when not computable. */
+  deviation: number | null
+  /** True when the absolute deviation exceeds the 40 % exclusion limit. */
+  excluded: boolean
+}
+
+export function costDeviationVerdict(
+  planned: number,
+  actual: number,
+): CostDeviationVerdict {
   const deviation = costDeviationPercent(planned, actual)
-  return deviation != null && Math.abs(deviation) > COST_DEVIATION_LIMIT_PERCENT
+  return {
+    deviation,
+    excluded:
+      deviation != null && Math.abs(deviation) > COST_DEVIATION_LIMIT_PERCENT,
+  }
+}
+
+export function isExcludedByCost(planned: number, actual: number): boolean {
+  return costDeviationVerdict(planned, actual).excluded
 }
 
 export function timeAdjustmentQty(

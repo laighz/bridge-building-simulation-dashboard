@@ -2,6 +2,7 @@ import {
   totalMinutes,
   type MilestoneId,
   type PhaseId,
+  type TimingOverrides,
   type WorkshopConfig,
 } from '../config/workshop.ts'
 
@@ -12,6 +13,7 @@ export type SessionState = {
   startedAtMs: number | null
   elapsedMsAtPause: number
   phaseOverride: PhaseId | null
+  timingOverrides: TimingOverrides
 }
 
 export type MilestoneStatus = 'upcoming' | 'current' | 'due' | 'reached'
@@ -56,6 +58,7 @@ export const initialSessionState: SessionState = {
   startedAtMs: null,
   elapsedMsAtPause: 0,
   phaseOverride: null,
+  timingOverrides: {},
 }
 
 export const DUE_WINDOW_MS = 10_000

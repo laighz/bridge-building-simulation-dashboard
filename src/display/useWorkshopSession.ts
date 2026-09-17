@@ -1,5 +1,9 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
-import { workshopConfig } from '../config/workshop.ts'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import {
+  applyTimingOverrides,
+  workshopConfig,
+  type WorkshopConfig,
+} from '../config/workshop.ts'
 import { deriveView } from '../domain/session.ts'
 import { sessionStore } from '../store/browserStore.ts'
 
@@ -12,6 +16,18 @@ function useNow(): number {
   return now
 }
 
+export function useEffectiveWorkshopConfig(): WorkshopConfig {
+  const timingOverrides = useSyncExternalStore(
+    sessionStore.subscribe,
+    () => sessionStore.getState().timingOverrides,
+    () => sessionStore.getState().timingOverrides,
+  )
+  return useMemo(
+    () => applyTimingOverrides(workshopConfig, timingOverrides),
+    [timingOverrides],
+  )
+}
+
 export function useWorkshopSession() {
   const state = useSyncExternalStore(
     sessionStore.subscribe,
@@ -19,6 +35,7 @@ export function useWorkshopSession() {
     sessionStore.getState,
   )
   const nowMs = useNow()
-  const view = deriveView(workshopConfig, state, nowMs)
-  return { state, view, nowMs, store: sessionStore }
+  const config = useEffectiveWorkshopConfig()
+  const view = deriveView(config, state, nowMs)
+  return { state, view, nowMs, store: sessionStore, config }
 }

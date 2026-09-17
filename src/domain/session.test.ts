@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { workshopConfig } from '../config/workshop.ts'
+import { applyTimingOverrides, workshopConfig } from '../config/workshop.ts'
 import {
   deriveView,
   elapsedMs,
@@ -17,6 +17,7 @@ function runningAt(elapsed: number): { state: SessionState; nowMs: number } {
       startedAtMs: 0,
       elapsedMsAtPause: 0,
       phaseOverride: null,
+      timingOverrides: {},
     },
     nowMs: elapsed,
   }
@@ -33,6 +34,7 @@ describe('elapsedMs', () => {
       startedAtMs: 10_000,
       elapsedMsAtPause: 0,
       phaseOverride: null,
+      timingOverrides: {},
     }
     expect(elapsedMs(state, 25_000)).toBe(15_000)
   })
@@ -43,6 +45,7 @@ describe('elapsedMs', () => {
       startedAtMs: null,
       elapsedMsAtPause: 12_000,
       phaseOverride: null,
+      timingOverrides: {},
     }
     expect(elapsedMs(state, 99_000)).toBe(12_000)
   })
@@ -53,6 +56,7 @@ describe('elapsedMs', () => {
       startedAtMs: 100_000,
       elapsedMsAtPause: 30_000,
       phaseOverride: null,
+      timingOverrides: {},
     }
     expect(elapsedMs(state, 110_000)).toBe(40_000)
   })
@@ -245,5 +249,89 @@ describe('urgency', () => {
   it('is overtime after the full 135 minutes', () => {
     const { state, nowMs } = runningAt(135 * MIN)
     expect(deriveView(workshopConfig, state, nowMs).urgency).toBe('overtime')
+  })
+})
+
+describe('applyTimingOverrides', () => {
+  it('reproduces the base timeline when no overrides are set', () => {
+    const config = applyTimingOverrides(workshopConfig, {})
+    expect(config.milestones.map((m) => [m.id, m.atMinutes])).toEqual([
+      ['vorkalkulation', 30],
+      ['skizze', 45],
+      ['fertigstellung', 135],
+    ])
+    expect(config.phases.map((p) => [p.id, p.startMinutes])).toEqual([
+      ['vorbereitung', null],
+      ['auftrag', 0],
+      ['planung', 10],
+      ['realisierung', 45],
+      ['abschluss', 135],
+    ])
+    const { state, nowMs } = runningAt(0)
+    expect(deriveView(config, state, nowMs).totalMs).toBe(135 * MIN)
+  })
+
+  it('recomputes milestones and phases from planning/realization overrides', () => {
+    const config = applyTimingOverrides(workshopConfig, {
+      planningMinutes: 30,
+      realizationMinutes: 60,
+    })
+    // Ohne expliziten sketchDueMinute folgt die Skizze der Planungszeit.
+    expect(config.milestones.find((m) => m.id === 'skizze')?.atMinutes).toBe(30)
+    expect(
+      config.milestones.find((m) => m.id === 'fertigstellung')?.atMinutes,
+    ).toBe(90)
+    expect(config.phases.find((p) => p.id === 'realisierung')?.startMinutes).toBe(
+      30,
+    )
+    expect(config.phases.find((p) => p.id === 'abschluss')?.startMinutes).toBe(90)
+    const { state, nowMs } = runningAt(30 * MIN)
+    const view = deriveView(config, state, nowMs)
+    expect(view.activePhaseId).toBe('realisierung')
+    expect(view.remainingMs).toBe(60 * MIN)
+  })
+
+  it('starts realization at an explicit sketchDueMinute', () => {
+    const config = applyTimingOverrides(workshopConfig, { sketchDueMinute: 50 })
+    expect(config.milestones.find((m) => m.id === 'skizze')?.atMinutes).toBe(50)
+    expect(config.phases.find((p) => p.id === 'realisierung')?.startMinutes).toBe(
+      50,
+    )
+    const { state, nowMs } = runningAt(45 * MIN)
+    expect(deriveView(config, state, nowMs).activePhaseId).toBe('planung')
+  })
+
+  it('moves the planning phase start with briefingMinutes', () => {
+    const config = applyTimingOverrides(workshopConfig, { briefingMinutes: 5 })
+    expect(config.phases.find((p) => p.id === 'planung')?.startMinutes).toBe(5)
+    const { state, nowMs } = runningAt(5 * MIN)
+    expect(deriveView(config, state, nowMs).activePhaseId).toBe('planung')
+  })
+
+  it('shifts the estimate milestone with estimateDueMinute', () => {
+    const config = applyTimingOverrides(workshopConfig, {
+      estimateDueMinute: 20,
+    })
+    const { state, nowMs } = runningAt(20 * MIN)
+    const view = deriveView(config, state, nowMs)
+    expect(
+      view.milestones.find((m) => m.id === 'vorkalkulation')?.status,
+    ).toBe('due')
+    expect(view.nextMilestone?.id).toBe('skizze')
+  })
+
+  it('adjusts the warning and critical windows', () => {
+    const config = applyTimingOverrides(workshopConfig, {
+      warningMinutes: 10,
+      criticalMinutes: 3,
+    })
+    const eightBefore = runningAt(22 * MIN)
+    expect(deriveView(config, eightBefore.state, eightBefore.nowMs).urgency).toBe(
+      'warning',
+    )
+    const twoBefore = runningAt(28 * MIN)
+    expect(deriveView(config, twoBefore.state, twoBefore.nowMs).urgency).toBe(
+      'critical',
+    )
   })
 })

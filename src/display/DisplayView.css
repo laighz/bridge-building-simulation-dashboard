@@ -3,12 +3,12 @@
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  padding: 12px 20px 16px;
+  padding: var(--space-4) var(--space-6) var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-3);
   background:
-    radial-gradient(900px 380px at 88% -8%, rgba(62, 198, 201, 0.1), transparent 58%),
+    radial-gradient(900px 380px at 88% -8%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 58%),
     linear-gradient(180deg, #121922 0%, var(--bg) 38%);
 }
 
@@ -22,6 +22,9 @@
   gap: var(--space-4);
   align-items: center;
   flex-shrink: 0;
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
 }
 
 .brand {
@@ -40,6 +43,7 @@
 
 .brand h1 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(1.05rem, 1.6vw, 1.4rem);
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -64,10 +68,13 @@
   font-size: var(--text-caption);
   font-weight: 600;
   letter-spacing: 0.04em;
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    color var(--dur-ui) var(--ease-out);
 }
 
 .status-idle .status-pill {
-  background: rgba(244, 240, 232, 0.08);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
   color: var(--muted);
 }
 
@@ -103,9 +110,10 @@
 
 .wall-clock {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.2rem, 1.8vw, 1.7rem);
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -161,6 +169,7 @@
 }
 
 .phase-label {
+  font-family: var(--font-display);
   font-size: clamp(0.78rem, 1vw, 0.95rem);
   font-weight: 600;
   color: var(--ink);
@@ -185,6 +194,13 @@
   color: #f3fff7;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .phase:not(.is-active):not(.is-completed) .phase-btn:hover {
+    background: var(--bg-hover);
+    color: var(--ink);
+  }
+}
+
 .stage {
   flex: 1;
   min-height: 0;
@@ -193,8 +209,9 @@
   align-items: center;
   justify-content: space-between;
   text-align: center;
-  gap: 6px;
-  padding-bottom: 8px;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  width: 100%;
 }
 
 .pause-banner,
@@ -206,10 +223,27 @@
   font-weight: 600;
 }
 
+.reset-banner {
+  animation: banner-in var(--dur-ui) var(--ease-out);
+}
+
+/* Pause-Banner bleibt immer im Layout (kein Sprung beim Pausieren),
+   wird nur per opacity/visibility umgeschaltet */
 .pause-banner {
   background: color-mix(in srgb, var(--warn) 20%, transparent);
   color: #f6d889;
   border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    visibility 0s linear var(--dur-fast);
+}
+
+.pause-banner.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dur-fast) var(--ease-out);
 }
 
 .hero-label {
@@ -223,12 +257,13 @@
 
 .hero-time {
   margin: 0;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 600;
-  font-size: clamp(3.4rem, 11vw, 7rem);
-  line-height: 0.9;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3.6rem, 12vw, 8.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+  transition: color var(--dur-ui) var(--ease-out);
 }
 
 .status-paused .hero-time {
@@ -246,7 +281,7 @@
 
 .hero-sub {
   margin: 0 0 4px;
-  font-size: clamp(1rem, 1.6vw, 1.3rem);
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
   color: var(--accent-2);
   max-width: 42rem;
   line-height: 1.35;
@@ -254,10 +289,10 @@
 }
 
 .cards {
-  width: min(1080px, 100%);
+  width: min(var(--container), 100%);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-3);
+  gap: var(--space-4);
   text-align: start;
 }
 
@@ -265,8 +300,11 @@
   background: var(--bg-elevated);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
-  padding: 14px 16px 12px;
+  padding: var(--space-4) var(--space-5);
   box-shadow: var(--shadow-soft);
+  transition:
+    box-shadow var(--dur-ui) var(--ease-out),
+    opacity var(--dur-ui) var(--ease-out);
 }
 
 .card-kicker {
@@ -274,7 +312,7 @@
   display: inline-flex;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(244, 240, 232, 0.08);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--ink-secondary);
@@ -282,6 +320,7 @@
 
 .card-title {
   margin: 8px 0 0;
+  font-family: var(--font-display);
   font-size: clamp(1.05rem, 1.5vw, 1.35rem);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -298,11 +337,11 @@
 
 .card-time {
   margin: 8px 0 0;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(1.45rem, 2.2vw, 2rem);
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .card.is-current {
@@ -346,7 +385,7 @@
 }
 
 .timeline {
-  width: min(1080px, 100%);
+  width: min(var(--container), 100%);
   flex-shrink: 0;
   padding-bottom: 4px;
 }
@@ -362,6 +401,7 @@
   border-radius: 8px;
   font-size: var(--text-caption);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .band-plan {
@@ -376,9 +416,9 @@
 
 .timeline-track {
   position: relative;
-  height: 10px;
+  height: 12px;
   border-radius: 999px;
-  background: rgba(244, 240, 232, 0.1);
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
   margin: 18px 8px 40px;
 }
 
@@ -387,6 +427,7 @@
   inset: 0 auto 0 0;
   border-radius: inherit;
   background: linear-gradient(90deg in oklab, var(--plan), var(--build));
+  transition: width var(--dur-ui) var(--ease-out);
 }
 
 .timeline-mark {
@@ -410,15 +451,9 @@
   position: absolute;
   top: 14px;
   white-space: nowrap;
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: var(--muted);
   line-height: 1.25;
-}
-
-.timeline-elapsed {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--text-caption);
   font-variant-numeric: tabular-nums;
 }
 
@@ -427,8 +462,11 @@
   bottom: 0;
   z-index: 20;
   margin-top: auto;
-  padding: 12px 14px 10px;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-5);
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
   border-radius: var(--radius-panel);
   background: color-mix(in srgb, #0c1118 88%, transparent);
   border: 1px solid var(--line);
@@ -454,7 +492,7 @@
   display: flex;
   gap: var(--space-3);
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-3);
 }
 
 .controls-row.wrap {
@@ -470,10 +508,11 @@
   background: var(--bg-surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
-  padding: 8px 12px;
+  padding: 8px var(--space-4);
   cursor: pointer;
   font-size: var(--text-ui);
-  min-height: 40px;
+  min-height: var(--hit);
+  font-variant-numeric: tabular-nums;
 }
 
 .controls button.primary {
@@ -481,14 +520,38 @@
   color: var(--accent-ink);
   border-color: transparent;
   font-weight: 600;
+  min-height: var(--hit);
+  padding-inline: var(--space-5);
+  font-size: var(--text-body);
 }
 
-@media (hover: hover) {
-  .controls button:hover,
-  .controls button.is-pressed {
-    background: var(--accent);
+/* Start/Pause spiegelt die Timeline-Bänder: laufend = Plan-Teal, gestoppt = Bau-Amber */
+.controls button.primary.is-running {
+  background: var(--plan);
+  color: var(--accent-ink);
+}
+
+.controls button.primary.is-stopped {
+  background: var(--build);
+  color: var(--warn-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .controls button:hover {
+    background: var(--bg-hover);
+    border-color: var(--line-strong);
+  }
+
+  .controls button.primary:hover,
+  .controls button.is-pressed:hover {
+    background: var(--accent-2);
     color: var(--accent-ink);
     border-color: transparent;
+  }
+
+  .controls button.primary.is-stopped:hover {
+    background: color-mix(in srgb, var(--build) 82%, #ffffff);
+    color: var(--warn-ink);
   }
 }
 
@@ -496,6 +559,11 @@
   background: var(--accent);
   color: var(--accent-ink);
   border-color: transparent;
+}
+
+.controls > .controls-more {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-2);
 }
 
 .controls-more {
@@ -506,9 +574,30 @@
   cursor: pointer;
   color: var(--ink-secondary);
   font-weight: 600;
-  min-height: 36px;
+  min-height: var(--hit);
   display: flex;
   align-items: center;
+  gap: 10px;
+  list-style: none;
+}
+
+.controls-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.controls-more summary::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.controls-more[open] summary::before {
+  transform: rotate(45deg);
 }
 
 .controls-more[open] summary {
@@ -536,7 +625,12 @@
   color: var(--ink);
   padding: 8px 10px;
   width: min(240px, 100%);
-  min-height: 40px;
+  min-height: var(--hit);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.controls-key input:focus {
+  border-color: var(--accent);
 }
 
 .scissors-rail {
@@ -560,15 +654,19 @@
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   border: 1px solid var(--line);
   font-size: var(--text-ui);
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    color var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out);
 }
 
 .scissors-chip em {
   font-style: normal;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.15rem;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .scissors-chip.is-due {
@@ -613,10 +711,17 @@
 
 @keyframes live {
   70% {
-    box-shadow: 0 0 0 8px rgba(111, 191, 115, 0);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--ok) 0%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(111, 191, 115, 0);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 0%, transparent);
+  }
+}
+
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
   }
 }
 

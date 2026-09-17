@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { playFuturisticCue, speakGerman } from '../audio/speech.ts'
-import { workshopConfig } from '../config/workshop.ts'
+import { speakGerman } from '../audio/speech.ts'
 import {
   announcementFromSessionEvents,
   scissorsReturnAnnouncement,
@@ -14,7 +13,7 @@ import { workshopStore } from '../store/workshopStore.ts'
 import { useWorkshopSession } from './useWorkshopSession.ts'
 
 export function Announcer() {
-  const { state, nowMs } = useWorkshopSession()
+  const { state, nowMs, config } = useWorkshopSession()
   const { data } = useWorkshopData()
   const prevElapsed = useRef<number | null>(null)
   const prevNow = useRef<number | null>(null)
@@ -34,7 +33,7 @@ export function Announcer() {
     }
 
     const lines = announcementFromSessionEvents(
-      sessionEvents(workshopConfig, prevElapsed.current, elapsed),
+      sessionEvents(config, prevElapsed.current, elapsed),
     )
     const due = newlyElapsedRentals(
       data.scissorsRentals,
@@ -67,7 +66,6 @@ export function Announcer() {
           await speakGerman(item.text, {
             elevenLabsKey: key,
             voiceId: import.meta.env.VITE_ELEVENLABS_VOICE_ID,
-            playCue: () => playFuturisticCue(),
           })
         } catch {
           // Keep the timer running even if speech is blocked.
@@ -75,6 +73,7 @@ export function Announcer() {
       }
     })()
   }, [
+    config,
     data.scissorsRentals,
     data.spokenKeys,
     data.teams,

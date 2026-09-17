@@ -3,10 +3,13 @@ import type { CatalogItem } from '../config/catalog.ts'
 import { lineTotal } from '../domain/costing.ts'
 import { formatEuro } from '../domain/money.ts'
 import { formatDuration } from '../domain/time.ts'
-import { teamLabel } from '../domain/teams.ts'
 import { useWorkshopData } from '../store/useWorkshopData.ts'
-import type { SheetId } from '../store/workshopStore.ts'
-import { workshopStore } from '../store/workshopStore.ts'
+import {
+  getTeamSubmit,
+  workshopStore,
+  type SheetId,
+} from '../store/workshopStore.ts'
+import { TeamBentoPicker } from '../teams/TeamBentoPicker.tsx'
 
 type Props = {
   title: string
@@ -45,32 +48,6 @@ export function CostSheet({
           <h1>{title}</h1>
         </div>
         <div className="sheet-meta">
-          <label>
-            Gruppe
-            {data.teams.length > 0 ? (
-              <select
-                value={data.activeTeamId}
-                onChange={(event) =>
-                  workshopStore.setActiveTeam(event.target.value)
-                }
-              >
-                {data.teams.map((team, index) => (
-                  <option key={team.id} value={team.id}>
-                    {teamLabel(team, index)}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                value={groupName}
-                placeholder="Teamname"
-                autoComplete="organization"
-                onChange={(event) =>
-                  workshopStore.setGroupName(event.target.value)
-                }
-              />
-            )}
-          </label>
           <p className={submitted ? 'sheet-stamp is-done' : 'sheet-stamp'}>
             {timeLabel}:{' '}
             {submittedElapsedMs == null
@@ -79,6 +56,31 @@ export function CostSheet({
           </p>
         </div>
       </header>
+
+      {data.teams.length > 0 ? (
+        <TeamBentoPicker
+          teams={data.teams}
+          activeTeamId={data.activeTeamId}
+          onSelect={(id) => workshopStore.setActiveTeam(id)}
+          statusFor={(teamId) =>
+            getTeamSubmit(data, teamId, sheet) == null ? null : 'abgegeben'
+          }
+        />
+      ) : (
+        <div className="sheet-meta sheet-teamname">
+          <label>
+            Teamname
+            <input
+              value={groupName}
+              placeholder="Teamname"
+              autoComplete="organization"
+              onChange={(event) =>
+                workshopStore.setGroupName(event.target.value)
+              }
+            />
+          </label>
+        </div>
+      )}
 
       <div className="sheet-table-wrap">
         <table className="sheet-table">

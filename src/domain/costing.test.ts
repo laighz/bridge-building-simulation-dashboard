@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { COST_DEVIATION_LIMIT_PERCENT, estimateItems } from '../config/catalog.ts'
 import {
   costDeviationPercent,
+  costDeviationVerdict,
   isExcludedByCost,
   lineTotal,
   sheetTotal,
@@ -50,6 +51,40 @@ describe('isExcludedByCost', () => {
 
   it('keeps the team at exactly 40 percent', () => {
     expect(isExcludedByCost(10_000_000, 14_000_000)).toBe(false)
+  })
+})
+
+describe('costDeviationVerdict', () => {
+  it('keeps the team at exactly 40.0 percent', () => {
+    const verdict = costDeviationVerdict(10_000_000, 14_000_000)
+    expect(verdict.deviation).toBe(40)
+    expect(verdict.excluded).toBe(false)
+  })
+
+  it('excludes the team at 40.1 percent', () => {
+    const verdict = costDeviationVerdict(10_000_000, 14_010_000)
+    expect(verdict.deviation).toBeCloseTo(40.1, 5)
+    expect(verdict.excluded).toBe(true)
+  })
+
+  it('excludes large negative deviations as well', () => {
+    const verdict = costDeviationVerdict(10_000_000, 5_000_000)
+    expect(verdict.deviation).toBe(-50)
+    expect(verdict.excluded).toBe(true)
+  })
+
+  it('reports zero deviation when both sums are zero', () => {
+    expect(costDeviationVerdict(0, 0)).toEqual({
+      deviation: 0,
+      excluded: false,
+    })
+  })
+
+  it('reports no deviation when the planned sum is zero', () => {
+    expect(costDeviationVerdict(0, 5_000_000)).toEqual({
+      deviation: null,
+      excluded: false,
+    })
   })
 })
 

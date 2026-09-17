@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { MouseEvent } from 'react'
-import { playFuturisticCue, speakGerman } from '../audio/speech.ts'
+import { speakGerman } from '../audio/speech.ts'
 import { rulesSlides } from '../config/rulesSlides.ts'
 import { timerStartedAnnouncement } from '../domain/announce.ts'
 import {
@@ -28,7 +28,6 @@ async function unlockAndStart() {
     await speakGerman(announcement.text, {
       elevenLabsKey: key || import.meta.env.VITE_ELEVENLABS_API_KEY,
       voiceId: import.meta.env.VITE_ELEVENLABS_VOICE_ID,
-      playCue: () => playFuturisticCue(),
     })
   } catch {
     // Voice is best-effort; the timer still starts.

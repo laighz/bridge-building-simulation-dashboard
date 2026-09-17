@@ -1,14 +1,15 @@
-import { workshopConfig, totalMinutes } from '../config/workshop.ts'
-import { formatDuration } from '../domain/time.ts'
+import { totalMinutes } from '../config/workshop.ts'
+import { useEffectiveWorkshopConfig } from './useWorkshopSession.ts'
 
 type Props = {
   elapsedMs: number
   progress: number
 }
 
-export function Timeline({ elapsedMs, progress }: Props) {
-  const total = totalMinutes(workshopConfig)
-  const planningPct = (workshopConfig.planningMinutes / total) * 100
+export function Timeline({ progress }: Props) {
+  const config = useEffectiveWorkshopConfig()
+  const total = totalMinutes(config)
+  const planningPct = (config.planningMinutes / total) * 100
   const realizationPct = 100 - planningPct
   const percent = Math.min(100, Math.round(progress * 100))
 
@@ -16,10 +17,10 @@ export function Timeline({ elapsedMs, progress }: Props) {
     <section className="timeline" aria-label="Zeitstrahl">
       <div className="timeline-bands">
         <div className="band band-plan" style={{ width: `${planningPct}%` }}>
-          Planung {workshopConfig.planningMinutes} Min
+          Planung {config.planningMinutes} Min
         </div>
         <div className="band band-build" style={{ width: `${realizationPct}%` }}>
-          Realisierung {workshopConfig.realizationMinutes} Min
+          Realisierung {config.realizationMinutes} Min
         </div>
       </div>
       <div
@@ -34,7 +35,7 @@ export function Timeline({ elapsedMs, progress }: Props) {
           className="timeline-fill"
           style={{ width: `${Math.min(100, progress * 100)}%` }}
         />
-        {workshopConfig.milestones.map((milestone) => (
+        {config.milestones.map((milestone) => (
           <span
             key={milestone.id}
             className="timeline-mark"
@@ -49,9 +50,6 @@ export function Timeline({ elapsedMs, progress }: Props) {
           </span>
         ))}
       </div>
-      <p className="timeline-elapsed">
-        Gelaufen: {formatDuration(elapsedMs)} von {formatDuration(total * 60_000)}
-      </p>
     </section>
   )
 }

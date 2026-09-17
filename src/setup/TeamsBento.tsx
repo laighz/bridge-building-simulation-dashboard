@@ -32,7 +32,7 @@ export function TeamsBento({
         {teams.map((team, index) => (
           <article
             key={team.id}
-            className={`bento-card${index === 0 ? ' is-hero' : ''}`}
+            className="bento-card"
           >
             <span className="bento-index" aria-hidden="true">
               {String(index + 1).padStart(2, '0')}
@@ -70,13 +70,6 @@ export function TeamsBento({
       </div>
 
       <footer className="bento-foot">
-        <p>
-          {teams.length === 0
-            ? 'Noch keine Teams. Legen Sie mindestens eines an.'
-            : ready
-              ? `${teams.length} ${teams.length === 1 ? 'Team' : 'Teams'} — bereit.`
-              : `${teams.length} Teams. Jedes Team braucht einen Namen.`}
-        </p>
         <button
           type="button"
           className="primary"
